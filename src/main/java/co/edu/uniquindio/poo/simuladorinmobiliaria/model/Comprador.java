@@ -10,7 +10,8 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-
+@Getter
+@Setter
 public class Comprador extends Usuario{
     //Atributos
     private double presupuesto;
@@ -40,4 +41,8 @@ public class Comprador extends Usuario{
         this.historialIntereses = new FiltroBusqueda(this.ciudadInteres,this.tipoInmuebleInteres, 0,
                 this.presupuesto, this.areaMinima);
     }
+
+
+
+    // metodos para hacer funcionar el filtro de busqueda y el historial, el cual este ultimo solo guardara los datos de la ultima busqueda
 }
