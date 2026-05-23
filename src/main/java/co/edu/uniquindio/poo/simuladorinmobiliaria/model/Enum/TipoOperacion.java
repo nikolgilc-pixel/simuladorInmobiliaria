@@ -1,4 +1,6 @@
 package co.edu.uniquindio.poo.simuladorinmobiliaria.model.Enum;
 
 public enum TipoOperacion {
+
+    VENTA, ARRIENDO
 }
