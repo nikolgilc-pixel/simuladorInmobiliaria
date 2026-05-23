@@ -16,7 +16,11 @@ public class GestorUsuarios {
     }
 
     //RegistrarUsuario
-    public String registrarUsuario ( String id, String nombreCompleto, String telefono, String gmail, )
-public String registrarUsuario ( String id, String nombreCompleto, String telefono, String gmail, )
+    public String registrarUsuario ( Usuario usuario){
+        return "";
+    }
+
+
+
 
 }

@@ -1,4 +1,7 @@
 package co.edu.uniquindio.poo.simuladorinmobiliaria.model;
 
-public record FiltroBusqueda() {
+import co.edu.uniquindio.poo.simuladorinmobiliaria.model.Enum.TipoInmueble;
+
+public record FiltroBusqueda(String ciudad, TipoInmueble tipoInmueble, double precioMinimo,
+                             double precioMaximo, double areaMinima) {
 }

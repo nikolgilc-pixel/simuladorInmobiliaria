@@ -5,14 +5,16 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
+
 @Setter
 public class GestorNotificaciones {
     //Atributos
 
     //Relaciones
-    private ArrayList<ICanalNotificacion> listaCanales;
+    private List<ICanalNotificacion> listaCanales;
 
-    public GestorNotificaciones(ArrayList<ICanalNotificacion> listaCanales) {
+    public GestorNotificaciones(ArrayList<ICanalNotificacion> listaCanales){
         this.listaCanales = listaCanales;
     }
 
