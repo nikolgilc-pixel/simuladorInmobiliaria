@@ -1,4 +1,4 @@
-package co.edu.uniquindio.poo.simuladorinmobiliaria.model;
+package co.edu.uniquindio.poo.simuladorinmobiliaria.model.Enum;
 
 public enum TipoNotificacion {
 

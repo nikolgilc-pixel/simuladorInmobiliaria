@@ -1,5 +1,6 @@
 package co.edu.uniquindio.poo.simuladorinmobiliaria.model;
 
+import co.edu.uniquindio.poo.simuladorinmobiliaria.model.Enum.TipoNotificacion;
 import lombok.Getter;
 import lombok.Setter;
 
