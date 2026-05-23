@@ -1,6 +1,6 @@
 package co.edu.uniquindio.poo.simuladorinmobiliaria.model;
 
-public class SMS extends ICanalNotificacion{
+public class SMS implements ICanalNotificacion{
     @Override
     public void enviarNotificacion(Usuario destinatario, Notificacion notificacion){
         System.out.println("Mensaje enviado a : "+ destinatario.getTelefono());
