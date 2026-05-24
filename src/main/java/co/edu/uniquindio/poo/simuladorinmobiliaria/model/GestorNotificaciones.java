@@ -32,7 +32,7 @@ public class GestorNotificaciones {
         Notificacion notificacion = crearNotificacion(
                 "Oferta aceptada",
                 "Tu oferta para el inmueble "
-                        + i.getNombre()
+                        + i.getCodigo()
                         + " fue aceptada.",
                 LocalDateTime.now(),
                 TipoNotificacion.OFERTA_ACEPTADA
@@ -47,7 +47,7 @@ public class GestorNotificaciones {
         Notificacion notificacion = crearNotificacion(
                 "Cambio de precio",
                 "El inmueble "
-                        + i.getNombre()
+                        + i.getCodigo()
                         + " cambió de precio.",
                 LocalDateTime.now(),
                 TipoNotificacion.CAMBIO_PRECIO
@@ -62,7 +62,7 @@ public class GestorNotificaciones {
         Notificacion notificacion = crearNotificacion(
             "Nuevo inmueble similar",
             "Encontramos un inmueble similar a "
-                    + i.getNombre(),
+                    + i.getCodigo(),
             LocalDateTime.now(),
             TipoNotificacion.INMUEBLE_SIMILAR
     );
@@ -71,17 +71,32 @@ public class GestorNotificaciones {
 
         return notificacion;
     }
+    public Notificacion crearNotificacionNuevaOferta(Usuario destinatario, Inmueble i, Comprador c, double monto) {
+        Notificacion notificacion = crearNotificacion(
+                "Nueva Oferta Recibida",
+                "¡Atención! El comprador " + c.getNombreCompleto()
+                        + " ha realizado una nueva oferta de $" + monto
+                        + " para tu inmueble ubicado en " + i.getDireccion() + ".",
+                LocalDateTime.now(),
+                TipoNotificacion.NUEVA_OFERTA
+        );
+
+        // Enviamos la notificación por los canales activos (Correo, WhatsApp, SMS)
+        enviar(destinatario, notificacion);
+
+        return notificacion;
+    }
     public void enviar(Usuario destinatario, Notificacion alerta){
-        destinatario.getListaNotificaciones()
-                .add(alerta);
+        //verificamos si el usuario tiene una lista de notificaciones, si no tiene le creamos una para evitar errores
+        if (destinatario.getListaNotificaciones() == null) {
+            destinatario.setListaNotificaciones(new ArrayList<>());
+        }
+        //guardamos en el historial de notificaciones del usurio
+        destinatario.getListaNotificaciones().add(alerta);
 
         for(ICanalNotificacion canal : listaCanales){
-
-            canal.enviarNotificacion(
-                    destinatariolerta.getContenido()
-            );
+            canal.enviarNotificacion(destinatario, alerta);
         }
-
     }
 }
 
