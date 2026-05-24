@@ -58,7 +58,8 @@ public class GestorNotificaciones {
         return notificacion;
     }
 
-    public Notificacion crearNotificacionInmuebleSimilar(Usuario destinatario, Inmueble i) {Notificacion notificacion = crearNotificacion(
+    public Notificacion crearNotificacionInmuebleSimilar(Usuario destinatario, Inmueble i) {
+        Notificacion notificacion = crearNotificacion(
             "Nuevo inmueble similar",
             "Encontramos un inmueble similar a "
                     + i.getNombre(),
@@ -77,8 +78,7 @@ public class GestorNotificaciones {
         for(ICanalNotificacion canal : listaCanales){
 
             canal.enviarNotificacion(
-                    destinatario,
-                    alerta.getContenido()
+                    destinatariolerta.getContenido()
             );
         }
 
