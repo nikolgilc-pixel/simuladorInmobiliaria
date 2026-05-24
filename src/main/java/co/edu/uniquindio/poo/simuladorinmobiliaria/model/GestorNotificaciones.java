@@ -12,19 +12,16 @@ public class GestorNotificaciones {
     //Atributos
 
     //Relaciones
+    private InmoSmart ownedByInmoSmart;
     private List<ICanalNotificacion> listaCanales;
 
-    public GestorNotificaciones(ArrayList<ICanalNotificacion> listaCanales){
-        this.listaCanales = listaCanales;
+    public GestorNotificaciones(InmoSmart ownedByInmoSmart) {
+        this.ownedByInmoSmart = ownedByInmoSmart;
+        this.listaCanales = new ArrayList<>();
     }
 
-    public Notificacion crearNotificacion(String titulo, String contenido, LocalDateTime fecha, TipoNotificacion tipo) {
-        Notificacion notificacion = new Notificacion();
-        notificacion.setTitulo(titulo);
-        notificacion.setContenido(contenido);
-        notificacion.setFecha(fecha);
-        notificacion.setTipo(tipo);
-        return notificacion;
+    public Notificacion crearNotificacion(String titulo, String contenido, TipoNotificacion tipo) {
+        return new Notificacion(titulo, contenido, tipo);
     }
 
 

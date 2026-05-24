@@ -1,10 +1,19 @@
 package co.edu.uniquindio.poo.simuladorinmobiliaria.model;
 
+import co.edu.uniquindio.poo.simuladorinmobiliaria.model.Enum.EstadoInmueble;
 import co.edu.uniquindio.poo.simuladorinmobiliaria.model.Enum.TipoInmueble;
 
 //ImportarFiltroBusqueda
 import lombok.Getter;
 import lombok.Setter;
+
+import javax.swing.*;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+
+@Getter
+@Setter
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -40,4 +49,23 @@ public class Comprador extends Usuario{
         this.historialIntereses = new FiltroBusqueda(this.ciudadInteres,this.tipoInmuebleInteres, 0,
                 this.presupuesto, this.areaMinima);
     }
+
+    //Mètodo para realizar una oferta sobre un inmueble
+    public void realizarOferta(Inmueble inmueble, double monto){
+        if(monto > 0 && inmueble.getEstado()== EstadoInmueble.DISPONIBLE){
+            Oferta nuevaOferta = new Oferta(this, inmueble, monto);
+            this.ofertas.add(nuevaOferta);
+            mostrarMensaje("Oferta realizada exitosamente por el monto de: " + monto);
+        } else{
+            mostrarMensaje("Error: El monto debe ser mayor a cero y el inmueble debe estar disponible.");
+        }
+    }
+
+    //--------------------------------------------UTILIDADES ----------------------------------------------------------
+
+    //Método para mostrar un mensaje en pantalla
+    public void mostrarMensaje(String mensaje){
+        JOptionPane.showMessageDialog(null, mensaje);
+    }
+
 }

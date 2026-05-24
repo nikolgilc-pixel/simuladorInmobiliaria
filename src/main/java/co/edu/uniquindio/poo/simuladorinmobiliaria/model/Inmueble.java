@@ -7,6 +7,11 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import lombok.Getter;
+import lombok.Setter;
+@Getter
+@Setter
+
 public class Inmueble {
     //Atributos
     private String codigo;
@@ -26,7 +31,7 @@ public class Inmueble {
     private Publicacion publicacion;
     private GestorInmuebles ownedByGestorInmuebles;
 
-
+    //Constructor
     public Inmueble(String codigo, String direccion, String ciudad, double area,
                     double precio, String descripcion, TipoInmueble tipoInmueble) {
         this.codigo = codigo;

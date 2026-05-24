@@ -4,14 +4,16 @@ import co.edu.uniquindio.poo.simuladorinmobiliaria.model.Enum.EstadoOferta;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDate;
+import java.time.Instant;
+import java.util.UUID;
+
 @Getter
 @Setter
 public class Oferta {
     //Atributos
     private String codigo;
     private double valor;
-    private LocalDate fecha;
+    private Instant fecha;
     private EstadoOferta estadoOferta;
 
     //Relaciones
@@ -19,13 +21,36 @@ public class Oferta {
     private Inmueble ownedByInmueble;
     private Comprador comprador;
 
-    public Oferta(String codigo, double valor,  Comprador comprador, Inmueble ownedByInmueble) {
-        this.codigo = codigo;
+    public Oferta(Comprador comprador, Inmueble ownedByInmueble, double valor) {
+        this.codigo = generarCodigoUnico();
         this.valor = valor;
-        this.fecha = LocalDate.now();
+        this.fecha = Instant.now();
         this.estadoOferta = EstadoOferta.PENDIENTE;
         this.ownedByInmueble= ownedByInmueble;
         this.comprador= comprador;
+    }
 
+    //Se genera un código único para la oferta
+    public String generarCodigoUnico(){
+        return UUID.randomUUID().toString();
+    }
+
+    //Método para actualizar el estado de la Oferta
+    public void actualizarEstado(EstadoOferta nuevoEstado){
+        this.estadoOferta = nuevoEstado;
+    }
+
+    //Método toString
+
+    @Override
+    public String toString() {
+        return "Oferta{" +
+                "codigo='" + codigo + '\'' +
+                ", valor=" + valor +
+                ", fecha=" + fecha +
+                ", estadoOferta=" + estadoOferta +
+                ", ownedByInmueble=" + ownedByInmueble.getCodigo() +
+                ", comprador=" + comprador.getId() +
+                '}';
     }
 }
