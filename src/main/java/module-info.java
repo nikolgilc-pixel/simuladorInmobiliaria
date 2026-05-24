@@ -6,4 +6,6 @@ module co.edu.uniquindio.poo.simuladorinmobiliaria {
 
     opens co.edu.uniquindio.poo.simuladorinmobiliaria to javafx.fxml;
     exports co.edu.uniquindio.poo.simuladorinmobiliaria;
+    exports co.edu.uniquindio.poo.simuladorinmobiliaria.app;
+    opens co.edu.uniquindio.poo.simuladorinmobiliaria.app to javafx.fxml;
 }

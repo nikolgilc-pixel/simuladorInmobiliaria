@@ -1,5 +1,6 @@
 package co.edu.uniquindio.poo.simuladorinmobiliaria.model;
 
+import co.edu.uniquindio.poo.simuladorinmobiliaria.model.Enum.AccionInmobiliaria;
 import co.edu.uniquindio.poo.simuladorinmobiliaria.model.Enum.TipoInmueble;
 
 //ImportarFiltroBusqueda
@@ -136,7 +137,7 @@ public class Comprador extends Usuario{
         //se revisa las publicaciones una por una con un for each
         for (Publicacion pub : carteleraGeneral) {
             Inmueble inm = pub.getInmueble();
-            if (inm == null) continue; // Si no hay inmueble, pasamos a la siguiente
+            if (inm == null) continue;
 
             // aqui ya se empieza a validar los filtros
             boolean coincideCiudad = true;

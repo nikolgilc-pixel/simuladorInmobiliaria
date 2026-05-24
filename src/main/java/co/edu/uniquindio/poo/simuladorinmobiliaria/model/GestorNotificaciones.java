@@ -13,6 +13,7 @@ public class GestorNotificaciones {
 
     //Relaciones
     private List<ICanalNotificacion> listaCanales;
+    private InmoSmart ownedByInmoSmart;
 
     public GestorNotificaciones(ArrayList<ICanalNotificacion> listaCanales){
         this.listaCanales = listaCanales;
