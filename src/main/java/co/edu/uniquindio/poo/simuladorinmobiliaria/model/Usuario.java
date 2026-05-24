@@ -40,4 +40,49 @@ public abstract class Usuario {
         this.rangoUsuario= RangoUsuario.PRINCIPIANTE;
 
     }
+    // aqui se hara el metodo para suamr puntos al usuario
+
+    public void sumarPuntos (AccionInmobiliaria accionInmobiliaria){
+        if ( accionInmobiliaria== null) return;
+        switch (accionInmobiliaria){
+            case OFERTAR -> this.puntosUsuario += 5;
+            case PUBLICAR -> this.puntosUsuario += 10;
+            case COMPRAR -> this.puntosUsuario += 50;
+            case COMPLETAR_TRANSACCION -> this.puntosUsuario +=100;
+        }
+        actualizarRango();
+    }
+
+    public void eliminarPuntos (CausaPenalizacion causaPenalizacion){
+        if (causaPenalizacion==null) return;
+        if (causaPenalizacion== CausaPenalizacion.ELIMINAR_PUBLICACION_SIN_VENTA){
+            this.puntosUsuario -= 50;
+            System.out.println("Penalización aplicada por eliminar publicación sin venta.");
+        }
+        if ( this.puntosUsuario <0) {
+            this.puntosUsuario =0;
+        }
+        actualizarRango();
+
+    }
+
+
+    public  void actualizarRango (){
+        if (this.puntosUsuario <= 100){
+            this.rangoUsuario= RangoUsuario.PRINCIPIANTE;
+        }else if( this.puntosUsuario>101 || this.puntosUsuario<=500){
+            this.rangoUsuario=RangoUsuario.INVERSIONISTA;
+        } else if (this.puntosUsuario > 501 || this.puntosUsuario <=2000 ){
+            this.rangoUsuario=RangoUsuario.EXPERTO_INMOBILIARIO;
+        }else  if ( this.puntosUsuario > 2000){
+            this.rangoUsuario=RangoUsuario.MAGNATE_INMOBILIARIO;
+        }
+    }
+    public void recibirNotificacion(Notificacion notificacion) {
+        if (notificacion != null) {
+            this.listaNotificaciones.add(notificacion);
+            System.out.println("[" + this.nombreCompleto + " recibió una alerta]: " + notificacion.getContenido());
+        }
+    }
+
 }
