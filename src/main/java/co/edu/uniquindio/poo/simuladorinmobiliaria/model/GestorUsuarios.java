@@ -9,9 +9,9 @@ public class GestorUsuarios {
     //Atributos
 
     //Relaciones
-    private Arraylist <Usuario> listaUsuarios;
+    private ArrayList <Usuario> listaUsuarios;
 
-    public GestorUsuario () {
+    public GestorUsuarios () {
             this.listaUsuarios = new ArrayList<>();
     }
 
