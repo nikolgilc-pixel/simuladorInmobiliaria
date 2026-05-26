@@ -8,7 +8,7 @@ import java.util.List;
 
 public class VendedorController {
 
-    private InmoSmart inmoSmart;
+    private final InmoSmart inmoSmart;
 
     public VendedorController(InmoSmart inmoSmart) {
         this.inmoSmart = inmoSmart;
@@ -22,15 +22,21 @@ public class VendedorController {
         return inmoSmart.getGestorTransacciones().listarTransaccionesPorVendedor(idVendedor);
     }
 
-    public void registrarInmueble(Vendedor vendedor, String direccion, String ciudad,
-                                   double area, double precio, String descripcion, TipoInmueble tipo) {
+    public Inmueble registrarInmueble(Vendedor vendedor, String direccion, String ciudad,
+                                      double area, double precio, String descripcion,
+                                      TipoInmueble tipo) {
         Inmueble nuevo = inmoSmart.getGestorInmuebles()
                 .registrarNuevoInmueble(direccion, ciudad, area, precio, descripcion, tipo);
         inmoSmart.vincularInmuebleAVendedor(nuevo, vendedor);
+        return nuevo;
     }
 
     public String publicarInmueble(Vendedor vendedor, Inmueble inmueble, String descripcion) {
         return inmoSmart.procesarSolicitudPublicacion(vendedor, inmueble, descripcion);
+    }
+
+    public String retirarPublicacion(Vendedor vendedor, String codigoPublicacion) {
+        return inmoSmart.procesarEliminacionPublicacion(vendedor, codigoPublicacion);
     }
 
     public List<Oferta> obtenerOfertasPendientes(Vendedor vendedor, Inmueble inmueble) {
@@ -43,5 +49,14 @@ public class VendedorController {
 
     public void rechazarOferta(Vendedor vendedor, Oferta oferta) {
         vendedor.rechazarOferta(oferta);
+    }
+
+    public String actualizarPrecio(Inmueble inmueble, double nuevoPrecio) {
+        return inmoSmart.actualizarPrecioInmueble(inmueble, nuevoPrecio);
+    }
+
+    public String actualizarPerfil(Vendedor vendedor, String nombre, String telefono,
+                                   String email, String password) {
+        return inmoSmart.actualizarDatosContacto(vendedor, nombre, telefono, email, password);
     }
 }

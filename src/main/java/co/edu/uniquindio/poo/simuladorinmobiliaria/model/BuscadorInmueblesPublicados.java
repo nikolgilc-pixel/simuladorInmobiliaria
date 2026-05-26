@@ -18,10 +18,10 @@ public class BuscadorInmueblesPublicados implements IServicioBusqueda {
         return resultados;
     }
 
-    public boolean cumpleConFiltros(Publicacion p, FiltroBusqueda f) {
+    private boolean cumpleConFiltros(Publicacion p, FiltroBusqueda f) {
         Inmueble i = p.getInmueble();
 
-        // Solo se retornan inmuebles disponibles (RN04)
+        // Solo se retornan inmuebles disponibles
         if (i.getEstado() != EstadoInmueble.DISPONIBLE) {
             return false;
         }

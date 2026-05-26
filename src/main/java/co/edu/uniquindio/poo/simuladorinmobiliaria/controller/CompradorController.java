@@ -10,7 +10,7 @@ import java.util.Optional;
 
 public class CompradorController {
 
-    private InmoSmart inmoSmart;
+    private final InmoSmart inmoSmart;
 
     public CompradorController(InmoSmart inmoSmart) {
         this.inmoSmart = inmoSmart;
@@ -27,19 +27,26 @@ public class CompradorController {
         return inmoSmart.obtenerSugerencias(comprador);
     }
 
-    public String realizarOferta(Comprador comprador, String codigoPub, double monto, NumberFormat nf) {
-        if (monto <= 0) {
-            return "El monto debe ser mayor a cero.";
-        }
-        Optional<Publicacion> pubOpt = inmoSmart.getGestorPublicaciones().buscarPublicacion(codigoPub);
-        if (pubOpt.isEmpty()) {
+    public List<String> obtenerCiudadesDisponibles() {
+        return inmoSmart.getCiudadesDisponibles();
+    }
+
+    public String realizarOferta(Comprador comprador, String codigoPub,
+                                  double monto, NumberFormat nf) {
+        if (monto <= 0) return "El monto debe ser mayor a cero.";
+        Optional<Publicacion> pubOpt = inmoSmart.getGestorPublicaciones()
+                .buscarPublicacion(codigoPub);
+        if (pubOpt.isEmpty())
             return "No se encontro una publicacion activa con ese codigo.";
-        }
         Inmueble inmueble = pubOpt.get().getInmueble();
-        if (inmueble.getEstado() != EstadoInmueble.DISPONIBLE) {
+        if (inmueble.getEstado() != EstadoInmueble.DISPONIBLE)
             return "Este inmueble ya no esta disponible.";
-        }
         inmoSmart.tramitarOferta(comprador, inmueble, monto);
         return "Oferta enviada: $" + nf.format(monto) + " por " + inmueble.getDireccion();
+    }
+
+    public String actualizarPerfil(Comprador comprador, String nombre, String telefono,
+                                    String email, String password) {
+        return inmoSmart.actualizarDatosContacto(comprador, nombre, telefono, email, password);
     }
 }

@@ -2,6 +2,7 @@ package co.edu.uniquindio.poo.simuladorinmobiliaria.model;
 
 import co.edu.uniquindio.poo.simuladorinmobiliaria.model.Enum.TipoInmueble;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,11 +13,7 @@ public class GestorReportes {
         Map<TipoInmueble, Integer> reporte = new HashMap<>();
         for (Transaccion t : listaTransacciones) {
             TipoInmueble tipo = t.inmueble().getTipoInmueble();
-            if (reporte.containsKey(tipo)) {
-                reporte.put(tipo, reporte.get(tipo) + 1);
-            } else {
-                reporte.put(tipo, 1);
-            }
+            reporte.put(tipo, reporte.getOrDefault(tipo, 0) + 1);
         }
         return reporte;
     }
@@ -25,29 +22,23 @@ public class GestorReportes {
         Map<String, Integer> reporte = new HashMap<>();
         for (Inmueble i : listaInmuebles) {
             String ciudad = i.getCiudad();
-            if (reporte.containsKey(ciudad)) {
-                reporte.put(ciudad, reporte.get(ciudad) + 1);
-            } else {
-                reporte.put(ciudad, 1);
-            }
+            reporte.put(ciudad, reporte.getOrDefault(ciudad, 0) + 1);
         }
         return reporte;
     }
 
-    public void generarReporteCompradoresTop(List<Usuario> compradores) {
-        // Ordenamiento burbuja descendente por puntosReputacion
-        for (int i = 0; i < compradores.size() - 1; i++) {
-            for (int j = 0; j < compradores.size() - i - 1; j++) {
-                if (compradores.get(j).getPuntosReputacion() < compradores.get(j + 1).getPuntosReputacion()) {
-                    Usuario temp = compradores.get(j);
-                    compradores.set(j, compradores.get(j + 1));
-                    compradores.set(j + 1, temp);
+    // Ordena una copia de la lista de compradores descendente por puntosReputacion
+    public List<Usuario> generarReporteCompradoresTop(List<Usuario> compradores) {
+        List<Usuario> copia = new ArrayList<>(compradores);
+        for (int i = 0; i < copia.size() - 1; i++) {
+            for (int j = 0; j < copia.size() - i - 1; j++) {
+                if (copia.get(j).getPuntosReputacion() < copia.get(j + 1).getPuntosReputacion()) {
+                    Usuario temp = copia.get(j);
+                    copia.set(j, copia.get(j + 1));
+                    copia.set(j + 1, temp);
                 }
             }
         }
-        for (Usuario u : compradores) {
-            System.out.println(u.getNombreCompleto() + " | Puntos: " + u.getPuntosReputacion()
-                    + " | Rango: " + u.getRangoUsuario());
-        }
+        return copia;
     }
 }

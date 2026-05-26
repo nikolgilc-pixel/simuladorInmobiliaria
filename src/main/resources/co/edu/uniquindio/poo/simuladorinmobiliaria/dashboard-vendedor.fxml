@@ -3,11 +3,14 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
@@ -15,7 +18,7 @@
 
 <VBox xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="co.edu.uniquindio.poo.simuladorinmobiliaria.viewController.VendedorViewController"
-      prefWidth="960" prefHeight="680">
+      prefWidth="980" prefHeight="720">
 
     <!-- Barra superior -->
     <HBox alignment="CENTER_LEFT" spacing="16"
@@ -29,7 +32,6 @@
                 style="-fx-background-color: white; -fx-text-fill: #1565C0; -fx-font-weight: bold; -fx-cursor: hand;"/>
     </HBox>
 
-    <!-- Contenido con pestanas -->
     <TabPane VBox.vgrow="ALWAYS" tabClosingPolicy="UNAVAILABLE">
 
         <!-- TAB 1: Mis Inmuebles -->
@@ -39,25 +41,29 @@
                     <Label text="Mis Inmuebles"
                            style="-fx-font-size: 15; -fx-font-weight: bold;"/>
                     <Region HBox.hgrow="ALWAYS"/>
+                    <Button text="Cambiar Precio" onAction="#cambiarPrecioAction"
+                            style="-fx-background-color: #E65100; -fx-text-fill: white; -fx-cursor: hand;"/>
                     <Button text="+ Registrar Inmueble" onAction="#mostrarDialogoRegistroAction"
                             style="-fx-background-color: #1565C0; -fx-text-fill: white; -fx-cursor: hand;"/>
                 </HBox>
                 <TableView fx:id="tablaInmuebles" VBox.vgrow="ALWAYS">
                     <columns>
-                        <TableColumn fx:id="colInmDireccion" text="Direccion" prefWidth="200"/>
-                        <TableColumn fx:id="colInmCiudad"    text="Ciudad"    prefWidth="120"/>
-                        <TableColumn fx:id="colInmTipo"      text="Tipo"      prefWidth="120"/>
+                        <TableColumn fx:id="colInmDireccion" text="Direccion"    prefWidth="200"/>
+                        <TableColumn fx:id="colInmCiudad"    text="Ciudad"       prefWidth="120"/>
+                        <TableColumn fx:id="colInmTipo"      text="Tipo"         prefWidth="110"/>
                         <TableColumn fx:id="colInmPrecio"    text="Precio (COP)" prefWidth="150"/>
-                        <TableColumn fx:id="colInmArea"      text="Area (m2)" prefWidth="90"/>
-                        <TableColumn fx:id="colInmEstado"    text="Estado"    prefWidth="120"/>
+                        <TableColumn fx:id="colInmArea"      text="Area (m2)"    prefWidth="90"/>
+                        <TableColumn fx:id="colInmEstado"    text="Estado"       prefWidth="110"/>
                     </columns>
                 </TableView>
             </VBox>
         </Tab>
 
-        <!-- TAB 2: Publicar Inmueble -->
-        <Tab text="Publicar Inmueble">
+        <!-- TAB 2: Publicaciones -->
+        <Tab text="Publicaciones">
             <VBox spacing="16" style="-fx-padding: 24;">
+
+                <!-- Sección: Publicar -->
                 <Label text="Publicar un Inmueble en el Catalogo"
                        style="-fx-font-size: 15; -fx-font-weight: bold;"/>
                 <GridPane hgap="12" vgap="12">
@@ -69,13 +75,29 @@
                     <Label text="Descripcion de publicacion:"
                            GridPane.columnIndex="0" GridPane.rowIndex="1"/>
                     <TextArea fx:id="txtDescripcionPublicacion"
-                              prefWidth="350" prefHeight="80" wrapText="true"
+                              prefWidth="350" prefHeight="70" wrapText="true"
                               promptText="Escribe una descripcion atractiva..."
                               GridPane.columnIndex="1" GridPane.rowIndex="1"/>
                 </GridPane>
                 <Button text="Publicar Inmueble" onAction="#publicarInmuebleAction"
                         style="-fx-background-color: #1565C0; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;"/>
                 <Label fx:id="lblMsgPublicacion" text="" wrapText="true"
+                       style="-fx-font-size: 13;"/>
+
+                <Separator/>
+
+                <!-- Sección: Retirar Publicación -->
+                <Label text="Retirar una Publicacion Activa"
+                       style="-fx-font-size: 14; -fx-font-weight: bold;"/>
+                <Label text="Al retirar una publicacion sin venta se aplica penalizacion de puntos."
+                       style="-fx-font-size: 12; -fx-text-fill: #666;"/>
+                <HBox spacing="10" alignment="CENTER_LEFT">
+                    <ComboBox fx:id="comboPublicacionEliminar" prefWidth="400"
+                              promptText="Selecciona una publicacion activa"/>
+                    <Button text="Retirar Publicacion" onAction="#eliminarPublicacionAction"
+                            style="-fx-background-color: #B71C1C; -fx-text-fill: white; -fx-cursor: hand;"/>
+                </HBox>
+                <Label fx:id="lblMsgEliminar" text="" wrapText="true"
                        style="-fx-font-size: 13;"/>
             </VBox>
         </Tab>
@@ -92,10 +114,10 @@
                 </HBox>
                 <TableView fx:id="tablaOfertas" VBox.vgrow="ALWAYS">
                     <columns>
-                        <TableColumn fx:id="colOfertaComprador" text="Comprador"    prefWidth="180"/>
-                        <TableColumn fx:id="colOfertaMonto"     text="Monto (COP)"  prefWidth="160"/>
-                        <TableColumn fx:id="colOfertaEstado"    text="Estado"       prefWidth="120"/>
-                        <TableColumn fx:id="colOfertaFecha"     text="Fecha"        prefWidth="200"/>
+                        <TableColumn fx:id="colOfertaComprador" text="Comprador"   prefWidth="180"/>
+                        <TableColumn fx:id="colOfertaMonto"     text="Monto (COP)" prefWidth="160"/>
+                        <TableColumn fx:id="colOfertaEstado"    text="Estado"      prefWidth="120"/>
+                        <TableColumn fx:id="colOfertaFecha"     text="Fecha"       prefWidth="200"/>
                     </columns>
                 </TableView>
                 <HBox spacing="10">
@@ -112,10 +134,16 @@
         </Tab>
 
         <!-- TAB 4: Mis Transacciones -->
-        <Tab text="Mis Transacciones">
+        <Tab text="Transacciones">
             <VBox spacing="10" style="-fx-padding: 12;">
-                <Label text="Historial de Transacciones"
-                       style="-fx-font-size: 15; -fx-font-weight: bold;"/>
+                <HBox alignment="CENTER_LEFT" spacing="10">
+                    <Label text="Historial de Transacciones"
+                           style="-fx-font-size: 15; -fx-font-weight: bold;"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Label text="Filtrar:" style="-fx-font-weight: bold;"/>
+                    <ComboBox fx:id="comboFiltroTrans" prefWidth="130"
+                              onAction="#filtrarTransaccionesAction"/>
+                </HBox>
                 <TableView fx:id="tablaTransacciones" VBox.vgrow="ALWAYS">
                     <columns>
                         <TableColumn fx:id="colTransCodigo"    text="Codigo"      prefWidth="100"/>
@@ -125,6 +153,71 @@
                         <TableColumn fx:id="colTransTipo"      text="Tipo"        prefWidth="100"/>
                     </columns>
                 </TableView>
+            </VBox>
+        </Tab>
+
+        <!-- TAB 5: Notificaciones -->
+        <Tab text="Notificaciones">
+            <VBox spacing="10" style="-fx-padding: 14;">
+                <HBox alignment="CENTER_LEFT" spacing="10">
+                    <Label text="Mis Notificaciones"
+                           style="-fx-font-size: 15; -fx-font-weight: bold;"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Button text="Refrescar" onAction="#refrescarNotificacionesVendAction"
+                            style="-fx-cursor: hand;"/>
+                </HBox>
+                <TableView fx:id="tablaNotifVendedor" VBox.vgrow="ALWAYS">
+                    <columns>
+                        <TableColumn fx:id="colNotVTitulo"    text="Titulo"  prefWidth="180"/>
+                        <TableColumn fx:id="colNotVContenido" text="Mensaje" prefWidth="340"/>
+                        <TableColumn fx:id="colNotVTipo"      text="Tipo"    prefWidth="160"/>
+                        <TableColumn fx:id="colNotVFecha"     text="Fecha"   prefWidth="200"/>
+                    </columns>
+                </TableView>
+            </VBox>
+        </Tab>
+
+        <!-- TAB 6: Mi Perfil -->
+        <Tab text="Mi Perfil">
+            <VBox spacing="16" style="-fx-padding: 24;">
+                <Label text="Actualizar Mis Datos de Contacto"
+                       style="-fx-font-size: 15; -fx-font-weight: bold;"/>
+                <Label text="Deja en blanco los campos que no deseas cambiar."
+                       style="-fx-font-size: 12; -fx-text-fill: #666;"/>
+                <Separator/>
+                <GridPane hgap="12" vgap="12">
+                    <Label text="Nombre completo:" GridPane.columnIndex="0" GridPane.rowIndex="0"
+                           style="-fx-font-weight: bold;"/>
+                    <TextField fx:id="fVendPerfilNombre" prefWidth="280"
+                               GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+
+                    <Label text="Telefono:" GridPane.columnIndex="0" GridPane.rowIndex="1"
+                           style="-fx-font-weight: bold;"/>
+                    <TextField fx:id="fVendPerfilTelefono" prefWidth="280"
+                               GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+
+                    <Label text="Correo electronico:" GridPane.columnIndex="0" GridPane.rowIndex="2"
+                           style="-fx-font-weight: bold;"/>
+                    <TextField fx:id="fVendPerfilEmail" prefWidth="280"
+                               GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+
+                    <Label text="Nueva contrasena:" GridPane.columnIndex="0" GridPane.rowIndex="3"
+                           style="-fx-font-weight: bold;"/>
+                    <PasswordField fx:id="fVendPerfilPassword" promptText="Dejar vacio para no cambiar"
+                                   prefWidth="280"
+                                   GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+                </GridPane>
+                <Button text="Guardar Cambios" onAction="#guardarPerfilVendAction"
+                        style="-fx-background-color: #1565C0; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;"/>
+                <Label fx:id="lblMsgVendPerfil" text="" wrapText="true"
+                       style="-fx-font-size: 13;"/>
+                <Separator/>
+                <Label text="Estadisticas de Actividad"
+                       style="-fx-font-size: 13; -fx-font-weight: bold;"/>
+                <Label fx:id="lblVendidas" text="Inmuebles vendidos: 0"
+                       style="-fx-font-size: 13; -fx-text-fill: #1B5E20;"/>
+                <Label fx:id="lblArrendadas" text="Inmuebles arrendados: 0"
+                       style="-fx-font-size: 13; -fx-text-fill: #E65100;"/>
             </VBox>
         </Tab>
 
