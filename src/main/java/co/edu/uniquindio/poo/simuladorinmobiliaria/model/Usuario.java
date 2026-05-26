@@ -4,14 +4,12 @@ import co.edu.uniquindio.poo.simuladorinmobiliaria.model.Enum.AccionInmobiliaria
 import co.edu.uniquindio.poo.simuladorinmobiliaria.model.Enum.CausaPenalizacion;
 import co.edu.uniquindio.poo.simuladorinmobiliaria.model.Enum.RangoUsuario;
 import lombok.Getter;
-import lombok.Setter;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 @Getter
-@Setter
 public abstract class Usuario {
     protected String id;
     protected String nombreCompleto;
