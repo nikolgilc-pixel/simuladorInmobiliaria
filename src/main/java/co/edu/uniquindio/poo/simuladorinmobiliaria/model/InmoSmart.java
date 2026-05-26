@@ -217,7 +217,7 @@ public class InmoSmart {
         return gestorUsuarios.eliminarComprador(idComprador);
     }
 
-    // El llamador debe pasar App.getUsuarioActual() para garantizar
+    // El llamador debe pasar SesionGlobal.getUsuarioActual() para garantizar
     // que solo se modifica la credencial del usuario que está en sesión.
     public String cambiarContrasena(Usuario usuario, String nuevaContrasena) {
         return gestorUsuarios.cambiarContrasena(usuario, nuevaContrasena);

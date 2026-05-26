@@ -11,7 +11,7 @@
 <?import javafx.scene.layout.VBox?>
 
 <VBox xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="co.edu.uniquindio.poo.simuladorinmobiliaria.viewController.RegistroCompradorViewController"
+      fx:controller="co.edu.uniquindio.poo.simuladorinmobiliaria.controller.RegistroCompradorController"
       alignment="CENTER" spacing="14"
       prefWidth="500" prefHeight="600"
       style="-fx-background-color: #F5F7FA;">

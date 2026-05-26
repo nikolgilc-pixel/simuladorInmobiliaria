@@ -17,7 +17,7 @@
 <?import javafx.scene.layout.VBox?>
 
 <VBox xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="co.edu.uniquindio.poo.simuladorinmobiliaria.viewController.VendedorViewController"
+      fx:controller="co.edu.uniquindio.poo.simuladorinmobiliaria.controller.VendedorController"
       prefWidth="980" prefHeight="720">
 
     <!-- Barra superior -->

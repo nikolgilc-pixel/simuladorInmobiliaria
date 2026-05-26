@@ -1,25 +1,63 @@
 package co.edu.uniquindio.poo.simuladorinmobiliaria.controller;
 
-import co.edu.uniquindio.poo.simuladorinmobiliaria.model.InmoSmart;
+import co.edu.uniquindio.poo.simuladorinmobiliaria.App;
+import co.edu.uniquindio.poo.simuladorinmobiliaria.SesionGlobal;
+import co.edu.uniquindio.poo.simuladorinmobiliaria.model.Administrador;
+import co.edu.uniquindio.poo.simuladorinmobiliaria.model.Comprador;
 import co.edu.uniquindio.poo.simuladorinmobiliaria.model.Usuario;
-import co.edu.uniquindio.poo.simuladorinmobiliaria.model.Enum.TipoInmueble;
+import co.edu.uniquindio.poo.simuladorinmobiliaria.model.Vendedor;
+import javafx.fxml.FXML;
+import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
+import javafx.scene.control.TextField;
 
 public class LoginController {
 
-    private final InmoSmart inmoSmart;
+    @FXML private TextField txtEmail;
+    @FXML private PasswordField txtPassword;
+    @FXML private Label lblError;
 
-    public LoginController(InmoSmart inmoSmart) {
-        this.inmoSmart = inmoSmart;
+    @FXML
+    void ingresarAction() {
+        String email    = txtEmail.getText().trim();
+        String password = txtPassword.getText().trim();
+
+        if (email.isEmpty() || password.isEmpty()) {
+            mostrarError("Por favor completa todos los campos.");
+            return;
+        }
+
+        Usuario usuario = SesionGlobal.getInmoSmart().autenticarUsuario(email, password);
+        if (usuario == null) {
+            mostrarError("Correo o contrasena incorrectos.");
+            return;
+        }
+
+        SesionGlobal.setUsuarioActual(usuario);
+        try {
+            if (usuario instanceof Administrador) {
+                App.navegarA("dashboard-admin.fxml");
+            } else if (usuario instanceof Vendedor) {
+                App.navegarA("dashboard-vendedor.fxml");
+            } else if (usuario instanceof Comprador) {
+                App.navegarA("dashboard-comprador.fxml");
+            }
+        } catch (Exception e) {
+            mostrarError("Error al abrir el dashboard: " + e.getMessage());
+        }
     }
 
-    public Usuario autenticarUsuario(String email, String password) {
-        return inmoSmart.autenticarUsuario(email, password);
+    @FXML
+    void irARegistroAction() {
+        try {
+            App.navegarA("registro-comprador.fxml");
+        } catch (Exception e) {
+            mostrarError("Error al abrir el registro: " + e.getMessage());
+        }
     }
 
-    public String registrarComprador(String nombre, String telefono, String email,
-                                     String password, double presupuesto, String ciudad,
-                                     TipoInmueble tipo, double areaMin) {
-        return inmoSmart.registrarComprador(nombre, telefono, email, password,
-                presupuesto, ciudad, tipo, areaMin);
+    private void mostrarError(String mensaje) {
+        lblError.setText(mensaje);
+        lblError.setVisible(true);
     }
 }

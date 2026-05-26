@@ -15,7 +15,7 @@
 <?import javafx.scene.layout.VBox?>
 
 <HBox xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="co.edu.uniquindio.poo.simuladorinmobiliaria.viewController.LoginViewController"
+      fx:controller="co.edu.uniquindio.poo.simuladorinmobiliaria.controller.LoginController"
       prefWidth="900" prefHeight="600">
 
     <!-- ═══ MITAD IZQUIERDA — Imagen desde classpath ═══ -->
