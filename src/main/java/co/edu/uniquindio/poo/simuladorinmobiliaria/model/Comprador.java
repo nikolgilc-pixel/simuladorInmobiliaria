@@ -2,12 +2,14 @@ package co.edu.uniquindio.poo.simuladorinmobiliaria.model;
 
 import co.edu.uniquindio.poo.simuladorinmobiliaria.model.Enum.TipoInmueble;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 @Getter
+@Setter
 public class Comprador extends Usuario {
     private double presupuesto;
     private String ciudadInteres;
@@ -37,11 +39,4 @@ public class Comprador extends Usuario {
     public void actualizarHistorial(FiltroBusqueda nuevo) {
         this.historialIntereses = nuevo;
     }
-
-    // Métodos cuya lógica completa es orquestada por InmoSmart desde el controlador
-    public void realizarOferta(Inmueble inmueble, double monto) {}
-    public void comprarInmueble() {}
-    public void solicitarBusqueda() {}
-    public void visualizarResultadosBusqueda(List<Publicacion> resultados) {}
-    public void verRecomendaciones() {}
 }

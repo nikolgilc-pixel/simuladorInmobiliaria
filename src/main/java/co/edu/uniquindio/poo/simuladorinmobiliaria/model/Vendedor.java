@@ -2,12 +2,14 @@ package co.edu.uniquindio.poo.simuladorinmobiliaria.model;
 
 import co.edu.uniquindio.poo.simuladorinmobiliaria.model.Enum.EstadoOferta;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 @Getter
+@Setter
 public class Vendedor extends Usuario {
     private int totalInmueblesVendidos;
     private int totalInmueblesArrendados;
@@ -34,15 +36,6 @@ public class Vendedor extends Usuario {
         return pendientes;
     }
 
-    // Delega a aceptarOferta o rechazarOferta; el cierre atómico lo orquesta InmoSmart
-    public void gestionarOferta(Oferta oferta, boolean aceptada) {
-        if (aceptada) {
-            aceptarOferta(oferta);
-        } else {
-            rechazarOferta(oferta);
-        }
-    }
-
     public void aceptarOferta(Oferta oferta) {
         oferta.actualizarEstado(EstadoOferta.ACEPTADA);
         totalInmueblesVendidos++;
@@ -56,9 +49,4 @@ public class Vendedor extends Usuario {
     public void registrarArriendo() {
         totalInmueblesArrendados++;
     }
-
-    // Métodos de solicitud: el controlador JavaFX los invoca y pasa datos a InmoSmart
-    public void registrarNuevoInmueble() {}
-    public void solicitarPublicarInmueble(String codigoInm, String descrip) {}
-    public void solicitarEliminarPublicacion(String codigoPublicacion) {}
 }

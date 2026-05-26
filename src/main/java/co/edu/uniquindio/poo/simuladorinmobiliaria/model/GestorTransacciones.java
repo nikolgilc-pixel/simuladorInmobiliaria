@@ -6,7 +6,6 @@ import lombok.Getter;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Getter
@@ -49,19 +48,6 @@ public class GestorTransacciones {
         listaTransacciones.add(transaccion);
     }
 
-    public Optional<Transaccion> buscarTransaccion(String codigoTransaccion) {
-        for (Transaccion t : listaTransacciones) {
-            if (t.codigo().equals(codigoTransaccion)) {
-                return Optional.of(t);
-            }
-        }
-        return Optional.empty();
-    }
-
-    public List<Transaccion> listarTransacciones() {
-        return listaTransacciones;
-    }
-
     public List<Transaccion> listarTransaccionesVenta() {
         List<Transaccion> resultado = new ArrayList<>();
         for (Transaccion t : listaTransacciones) {
@@ -102,8 +88,4 @@ public class GestorTransacciones {
         return resultado;
     }
 
-    public void eliminarTransaccion(String codigoTransaccion) {
-        Optional<Transaccion> opt = buscarTransaccion(codigoTransaccion);
-        opt.ifPresent(listaTransacciones::remove);
-    }
 }
