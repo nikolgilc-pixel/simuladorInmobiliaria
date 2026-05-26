@@ -37,7 +37,3 @@ build/
 
 ### Mac OS ###
 .DS_Store
-
-### Variables de entorno (credenciales) ###
-.env
-.env.local

@@ -25,7 +25,6 @@ public class Inmueble {
     private Vendedor vendedorAsignado;
     private List<Oferta> listaOfertas;
     private Publicacion publicacion;
-    private List<String> nombresImagenes;
 
     public Inmueble(String direccion, String ciudad, double area, double precio,
                     String descripcion, TipoInmueble tipoInmueble) {
@@ -39,7 +38,6 @@ public class Inmueble {
         this.estado = EstadoInmueble.DISPONIBLE;
         this.fechaRegistro = LocalDate.now();
         this.listaOfertas = new ArrayList<>();
-        this.nombresImagenes = new ArrayList<>();
     }
 
     public void actualizarEstadoInmueble(EstadoInmueble nuevoEstado) {
