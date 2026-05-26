@@ -1,86 +1,67 @@
 package co.edu.uniquindio.poo.simuladorinmobiliaria.model;
 
-import lombok.Setter;
+import lombok.Getter;
 
 import java.util.ArrayList;
+import java.util.List;
 
-@Setter
+@Getter
 public class GestorUsuarios {
-    //Atributos
+    private List<Usuario> listaUsuarios;
 
-    //Relaciones
-    private ArrayList <Usuario> listaUsuarios;
-    private InmoSmart ownedByInmoSmart;
-
-    public GestorUsuarios () {
-            this.listaUsuarios = new ArrayList<>();
+    public GestorUsuarios() {
+        this.listaUsuarios = new ArrayList<>();
     }
 
-    //RegistrarUsuario
-    public String registrarUsuario(Usuario usuario) {
-        if (usuario == null) {
-            return "ERROR: El usuario no puede ser nulo.";
-        }
-
-        if (buscarUsuario(usuario.getId()) != null) {
-            return "ERROR: Ya existe un usuario con la identificación " + usuario.getId() + ".";
-        }
-
-        this.listaUsuarios.add(usuario);
-        return "ÉXITO: Usuario registrado correctamente.";
-    }
-
-    //buscar el usuario
-    public Usuario buscarUsuario(String id) {
-        if (id == null || id.isBlank()) return null;
-
+    public String añadirUsuario(Usuario usuario) {
         for (Usuario u : listaUsuarios) {
-            if (u.getId().equals(id)) {
+            if (u.getId().equals(usuario.getId())) {
+                return null;
+            }
+        }
+        listaUsuarios.add(usuario);
+        return usuario.getId();
+    }
+
+    public Usuario buscarUsuario(String idUsuario) {
+        for (Usuario u : listaUsuarios) {
+            if (u.getId().equals(idUsuario)) {
                 return u;
             }
         }
         return null;
     }
-    //listar compradores
-    public ArrayList<Comprador> listarCompradores() {
-        ArrayList<Comprador> compradores = new ArrayList<>();
+
+    public List<Usuario> listarCompradores() {
+        List<Usuario> compradores = new ArrayList<>();
         for (Usuario u : listaUsuarios) {
             if (u instanceof Comprador) {
-                compradores.add((Comprador) u);
+                compradores.add(u);
             }
         }
         return compradores;
     }
 
-    //listarVendedores
-    public ArrayList<Vendedor> listarVendedores() {
-        ArrayList<Vendedor> vendedores = new ArrayList<>();
+    public List<Usuario> listarVendedores() {
+        List<Usuario> vendedores = new ArrayList<>();
         for (Usuario u : listaUsuarios) {
             if (u instanceof Vendedor) {
-                vendedores.add((Vendedor) u);
+                vendedores.add(u);
             }
         }
         return vendedores;
     }
 
-    //listarUsuarios
-    public ArrayList<Usuario> listarUsuarios() {
-        return this.listaUsuarios;
+    public List<Usuario> listarUsuarios() {
+        return listaUsuarios;
     }
 
-    //eliminarUsuario
-    public void eliminarUsuario(String id) {
-        Usuario encontrado = buscarUsuario(id);
-
-        if (encontrado != null) {
-            this.listaUsuarios.remove(encontrado);
-            System.out.println("Usuario con ID " + id + " eliminado con éxito.");
-        } else {
-            System.out.println("Error: El usuario no existe en el sistema.");
+    public boolean eliminarUsuario(String idUsuario) {
+        Usuario usuario = buscarUsuario(idUsuario);
+        if (usuario != null) {
+            listaUsuarios.remove(usuario);
+            return true;
         }
+        return false;
     }
 }
-
-
-
-

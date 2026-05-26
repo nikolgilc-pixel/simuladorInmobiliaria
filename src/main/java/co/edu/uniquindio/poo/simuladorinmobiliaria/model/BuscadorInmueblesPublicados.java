@@ -1,60 +1,49 @@
 package co.edu.uniquindio.poo.simuladorinmobiliaria.model;
 
+import co.edu.uniquindio.poo.simuladorinmobiliaria.model.Enum.EstadoInmueble;
+
 import java.util.ArrayList;
 import java.util.List;
 
-public class BuscadorInmueblesPublicados implements IServicioBusqueda{
+public class BuscadorInmueblesPublicados implements IServicioBusqueda {
 
     @Override
-    public List<Publicacion> buscarPublicaciones(List<Publicacion> listaPublicaciones, FiltroBusqueda f) {
+    public List<Publicacion> buscarPublicaciones(List<Publicacion> todas, FiltroBusqueda f) {
         List<Publicacion> resultados = new ArrayList<>();
-
-        if (listaPublicaciones == null || f == null) {
-            return resultados;
+        for (Publicacion p : todas) {
+            if (cumpleConFiltros(p, f)) {
+                resultados.add(p);
+            }
         }
-        //for each para pasar por cada una de las publicaiones y tomar el inmueble
-        for (Publicacion publicacion : listaPublicaciones) {
-            Inmueble inmueble = publicacion.getInmueble();
-
-            if (inmueble == null) {
-                continue;
-            }
-            //ciudadDiferente?
-            if (f.ciudad() != null && !f.ciudad().isBlank()) {
-                if (!inmueble.getCiudad().equalsIgnoreCase(f.ciudad())) {
-                    continue;
-                }
-            }
-
-            if (f.tipoInmueble() != null) {
-                if (inmueble.getTipoInmueble() != f.tipoInmueble()) {
-                    continue;
-                }
-            }
-
-            if (f.precioMinimo() > 0) {
-                if (inmueble.getPrecio() < f.precioMinimo()) {
-                    continue;
-                }
-            }
-
-            //
-            if (f.precioMaximo() > 0) {
-                if (inmueble.getPrecio() > f.precioMaximo()) {
-                    continue;
-                }
-            }
-
-            if (f.areaMinima() > 0) {
-                if (inmueble.getArea() < f.areaMinima()) {
-                    continue;
-                }
-            }
-            resultados.add(publicacion);
-        }
-
         return resultados;
     }
+
+    public boolean cumpleConFiltros(Publicacion p, FiltroBusqueda f) {
+        Inmueble i = p.getInmueble();
+
+        // Solo se retornan inmuebles disponibles (RN04)
+        if (i.getEstado() != EstadoInmueble.DISPONIBLE) {
+            return false;
+        }
+        if (f.ciudad() != null && !f.ciudad().isEmpty()) {
+            if (!i.getCiudad().equalsIgnoreCase(f.ciudad())) {
+                return false;
+            }
+        }
+        if (f.tipoInmueble() != null) {
+            if (i.getTipoInmueble() != f.tipoInmueble()) {
+                return false;
+            }
+        }
+        if (i.getPrecio() < f.precioMinimo()) {
+            return false;
+        }
+        if (f.precioMaximo() > 0 && i.getPrecio() > f.precioMaximo()) {
+            return false;
+        }
+        if (i.getArea() < f.areaMinima()) {
+            return false;
+        }
+        return true;
+    }
 }
-
-

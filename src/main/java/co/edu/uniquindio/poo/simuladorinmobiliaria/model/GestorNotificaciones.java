@@ -1,103 +1,71 @@
 package co.edu.uniquindio.poo.simuladorinmobiliaria.model;
 
 import co.edu.uniquindio.poo.simuladorinmobiliaria.model.Enum.TipoNotificacion;
-import lombok.Setter;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-@Setter
 public class GestorNotificaciones {
-    //Atributos
-
-    //Relaciones
     private List<ICanalNotificacion> listaCanales;
-    private InmoSmart ownedByInmoSmart;
 
-    public GestorNotificaciones(ArrayList<ICanalNotificacion> listaCanales){
-        this.listaCanales = listaCanales;
+    public GestorNotificaciones() {
+        this.listaCanales = new ArrayList<>();
     }
 
-    public Notificacion crearNotificacion(String titulo, String contenido, LocalDateTime fecha, TipoNotificacion tipo) {
-        Notificacion notificacion = new Notificacion();
-        notificacion.setTitulo(titulo);
-        notificacion.setContenido(contenido);
-        notificacion.setFecha(fecha);
-        notificacion.setTipo(tipo);
-        return notificacion;
+    // Registra un canal de notificación (inyección vía método de registro — RT03)
+    public void agregarCanal(ICanalNotificacion canal) {
+        listaCanales.add(canal);
     }
 
-
-    public Notificacion crearNotificacionOfertaAceptada(Usuario destinatario, Inmueble i) {
-        Notificacion notificacion = crearNotificacion(
-                "Oferta aceptada",
-                "Tu oferta para el inmueble "
-                        + i.getCodigo()
-                        + " fue aceptada.",
-                LocalDateTime.now(),
-                TipoNotificacion.OFERTA_ACEPTADA
-        );
-
-        enviar(destinatario, notificacion);
-
-        return notificacion;
-    }
-
-    public Notificacion crearNotificacionCambioPrecio(Usuario destinatario, Inmueble i) {
-        Notificacion notificacion = crearNotificacion(
-                "Cambio de precio",
-                "El inmueble "
-                        + i.getCodigo()
-                        + " cambió de precio.",
-                LocalDateTime.now(),
-                TipoNotificacion.CAMBIO_PRECIO
-        );
-
-        enviar(destinatario, notificacion);
-
-        return notificacion;
-    }
-
-    public Notificacion crearNotificacionInmuebleSimilar(Usuario destinatario, Inmueble i) {
-        Notificacion notificacion = crearNotificacion(
-            "Nuevo inmueble similar",
-            "Encontramos un inmueble similar a "
-                    + i.getCodigo(),
-            LocalDateTime.now(),
-            TipoNotificacion.INMUEBLE_SIMILAR
-    );
-
-        enviar(destinatario, notificacion);
-
-        return notificacion;
-    }
-    public Notificacion crearNotificacionNuevaOferta(Usuario destinatario, Inmueble i, Comprador c, double monto) {
-        Notificacion notificacion = crearNotificacion(
-                "Nueva Oferta Recibida",
-                "¡Atención! El comprador " + c.getNombreCompleto()
-                        + " ha realizado una nueva oferta de $" + monto
-                        + " para tu inmueble ubicado en " + i.getDireccion() + ".",
-                LocalDateTime.now(),
+    public Notificacion crearNotificacionNuevaOferta(Usuario destinatario, Inmueble inmueble) {
+        Notificacion n = new Notificacion(
+                "Nueva oferta recibida",
+                "Tienes una nueva oferta sobre el inmueble en " + inmueble.getDireccion()
+                        + ", " + inmueble.getCiudad() + ".",
                 TipoNotificacion.NUEVA_OFERTA
         );
-
-        // Enviamos la notificación por los canales activos (Correo, WhatsApp, SMS)
-        enviar(destinatario, notificacion);
-
-        return notificacion;
+        enviar(destinatario, n);
+        return n;
     }
-    public void enviar(Usuario destinatario, Notificacion alerta){
-        //verificamos si el usuario tiene una lista de notificaciones, si no tiene le creamos una para evitar errores
-        if (destinatario.getListaNotificaciones() == null) {
-            destinatario.setListaNotificaciones(new ArrayList<>());
-        }
-        //guardamos en el historial de notificaciones del usurio
-        destinatario.getListaNotificaciones().add(alerta);
 
-        for(ICanalNotificacion canal : listaCanales){
+    public Notificacion crearNotificacionOfertaAceptada(Usuario destinatario, Inmueble inmueble) {
+        Notificacion n = new Notificacion(
+                "Oferta aceptada",
+                "Tu oferta para el inmueble en " + inmueble.getDireccion()
+                        + ", " + inmueble.getCiudad() + " fue aceptada.",
+                TipoNotificacion.OFERTA_ACEPTADA
+        );
+        enviar(destinatario, n);
+        return n;
+    }
+
+    public Notificacion crearNotificacionCambioPrecio(Usuario destinatario, Inmueble inmueble) {
+        Notificacion n = new Notificacion(
+                "Cambio de precio",
+                "El inmueble en " + inmueble.getDireccion()
+                        + ", " + inmueble.getCiudad() + " cambió de precio.",
+                TipoNotificacion.CAMBIO_PRECIO
+        );
+        enviar(destinatario, n);
+        return n;
+    }
+
+    public Notificacion crearNotificacionInmuebleSimilar(Usuario destinatario, Inmueble inmueble) {
+        Notificacion n = new Notificacion(
+                "Inmueble similar disponible",
+                "Encontramos un inmueble similar en " + inmueble.getDireccion()
+                        + ", " + inmueble.getCiudad() + ".",
+                TipoNotificacion.INMUEBLE_SIMILAR
+        );
+        enviar(destinatario, n);
+        return n;
+    }
+
+    // Persiste la notificación en el usuario y la despacha por todos los canales
+    public void enviar(Usuario destinatario, Notificacion alerta) {
+        destinatario.recibirNotificacion(alerta);
+        for (ICanalNotificacion canal : listaCanales) {
             canal.enviarNotificacion(destinatario, alerta);
         }
     }
 }
-
