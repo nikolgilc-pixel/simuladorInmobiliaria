@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="co.edu.uniquindio.poo.simuladorinmobiliaria.controller.VendedorController"
+      prefWidth="960" prefHeight="680">
+
+    <!-- Barra superior -->
+    <HBox alignment="CENTER_LEFT" spacing="16"
+          style="-fx-background-color: #1565C0; -fx-padding: 12;">
+        <Label text="InmoSmart  —  Panel Vendedor"
+               style="-fx-font-size: 18; -fx-font-weight: bold; -fx-text-fill: white;"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Label fx:id="lblNombreUsuario"
+               style="-fx-text-fill: #BBDEFB; -fx-font-size: 13;"/>
+        <Button text="Cerrar sesion" onAction="#cerrarSesionAction"
+                style="-fx-background-color: white; -fx-text-fill: #1565C0; -fx-font-weight: bold; -fx-cursor: hand;"/>
+    </HBox>
+
+    <!-- Contenido con pestanas -->
+    <TabPane VBox.vgrow="ALWAYS" tabClosingPolicy="UNAVAILABLE">
+
+        <!-- TAB 1: Mis Inmuebles -->
+        <Tab text="Mis Inmuebles">
+            <VBox spacing="10" style="-fx-padding: 12;">
+                <HBox alignment="CENTER_LEFT" spacing="10">
+                    <Label text="Mis Inmuebles"
+                           style="-fx-font-size: 15; -fx-font-weight: bold;"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Button text="+ Registrar Inmueble" onAction="#mostrarDialogoRegistroAction"
+                            style="-fx-background-color: #1565C0; -fx-text-fill: white; -fx-cursor: hand;"/>
+                </HBox>
+                <TableView fx:id="tablaInmuebles" VBox.vgrow="ALWAYS">
+                    <columns>
+                        <TableColumn fx:id="colInmDireccion" text="Direccion" prefWidth="200"/>
+                        <TableColumn fx:id="colInmCiudad"    text="Ciudad"    prefWidth="120"/>
+                        <TableColumn fx:id="colInmTipo"      text="Tipo"      prefWidth="120"/>
+                        <TableColumn fx:id="colInmPrecio"    text="Precio (COP)" prefWidth="150"/>
+                        <TableColumn fx:id="colInmArea"      text="Area (m2)" prefWidth="90"/>
+                        <TableColumn fx:id="colInmEstado"    text="Estado"    prefWidth="120"/>
+                    </columns>
+                </TableView>
+            </VBox>
+        </Tab>
+
+        <!-- TAB 2: Publicar Inmueble -->
+        <Tab text="Publicar Inmueble">
+            <VBox spacing="16" style="-fx-padding: 24;">
+                <Label text="Publicar un Inmueble en el Catalogo"
+                       style="-fx-font-size: 15; -fx-font-weight: bold;"/>
+                <GridPane hgap="12" vgap="12">
+                    <Label text="Selecciona el inmueble:"
+                           GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                    <ComboBox fx:id="comboInmueblePublicar" prefWidth="350"
+                              GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+
+                    <Label text="Descripcion de publicacion:"
+                           GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                    <TextArea fx:id="txtDescripcionPublicacion"
+                              prefWidth="350" prefHeight="80" wrapText="true"
+                              promptText="Escribe una descripcion atractiva..."
+                              GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                </GridPane>
+                <Button text="Publicar Inmueble" onAction="#publicarInmuebleAction"
+                        style="-fx-background-color: #1565C0; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;"/>
+                <Label fx:id="lblMsgPublicacion" text="" wrapText="true"
+                       style="-fx-font-size: 13;"/>
+            </VBox>
+        </Tab>
+
+        <!-- TAB 3: Gestionar Ofertas -->
+        <Tab text="Gestionar Ofertas">
+            <VBox spacing="12" style="-fx-padding: 16;">
+                <Label text="Ofertas Pendientes por Inmueble"
+                       style="-fx-font-size: 15; -fx-font-weight: bold;"/>
+                <HBox spacing="10" alignment="CENTER_LEFT">
+                    <Label text="Ver ofertas de:" style="-fx-font-weight: bold;"/>
+                    <ComboBox fx:id="comboInmuebleOfertas" prefWidth="360"
+                              onAction="#cargarOfertasAction"/>
+                </HBox>
+                <TableView fx:id="tablaOfertas" VBox.vgrow="ALWAYS">
+                    <columns>
+                        <TableColumn fx:id="colOfertaComprador" text="Comprador"    prefWidth="180"/>
+                        <TableColumn fx:id="colOfertaMonto"     text="Monto (COP)"  prefWidth="160"/>
+                        <TableColumn fx:id="colOfertaEstado"    text="Estado"       prefWidth="120"/>
+                        <TableColumn fx:id="colOfertaFecha"     text="Fecha"        prefWidth="200"/>
+                    </columns>
+                </TableView>
+                <HBox spacing="10">
+                    <Button text="Aceptar (Venta)"    onAction="#aceptarVentaAction"
+                            style="-fx-background-color: #2E7D32; -fx-text-fill: white; -fx-cursor: hand;"/>
+                    <Button text="Aceptar (Arriendo)" onAction="#aceptarArriendoAction"
+                            style="-fx-background-color: #E65100; -fx-text-fill: white; -fx-cursor: hand;"/>
+                    <Button text="Rechazar"           onAction="#rechazarOfertaAction"
+                            style="-fx-background-color: #B71C1C; -fx-text-fill: white; -fx-cursor: hand;"/>
+                </HBox>
+                <Label fx:id="lblMsgOferta" text="" wrapText="true"
+                       style="-fx-font-size: 13;"/>
+            </VBox>
+        </Tab>
+
+        <!-- TAB 4: Mis Transacciones -->
+        <Tab text="Mis Transacciones">
+            <VBox spacing="10" style="-fx-padding: 12;">
+                <Label text="Historial de Transacciones"
+                       style="-fx-font-size: 15; -fx-font-weight: bold;"/>
+                <TableView fx:id="tablaTransacciones" VBox.vgrow="ALWAYS">
+                    <columns>
+                        <TableColumn fx:id="colTransCodigo"    text="Codigo"      prefWidth="100"/>
+                        <TableColumn fx:id="colTransComprador" text="Comprador"   prefWidth="160"/>
+                        <TableColumn fx:id="colTransInmueble"  text="Inmueble"    prefWidth="200"/>
+                        <TableColumn fx:id="colTransValor"     text="Valor Final" prefWidth="150"/>
+                        <TableColumn fx:id="colTransTipo"      text="Tipo"        prefWidth="100"/>
+                    </columns>
+                </TableView>
+            </VBox>
+        </Tab>
+
+    </TabPane>
+</VBox>
