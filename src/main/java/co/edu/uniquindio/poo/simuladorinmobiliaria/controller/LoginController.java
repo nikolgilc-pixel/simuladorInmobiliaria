@@ -1,51 +1,17 @@
 package co.edu.uniquindio.poo.simuladorinmobiliaria.controller;
 
-import co.edu.uniquindio.poo.simuladorinmobiliaria.App;
-import co.edu.uniquindio.poo.simuladorinmobiliaria.SesionGlobal;
-import co.edu.uniquindio.poo.simuladorinmobiliaria.model.Comprador;
+import co.edu.uniquindio.poo.simuladorinmobiliaria.model.InmoSmart;
 import co.edu.uniquindio.poo.simuladorinmobiliaria.model.Usuario;
-import co.edu.uniquindio.poo.simuladorinmobiliaria.model.Vendedor;
-import javafx.fxml.FXML;
-import javafx.scene.control.Label;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
 
 public class LoginController {
 
-    @FXML private TextField txtEmail;
-    @FXML private PasswordField txtPassword;
-    @FXML private Label lblError;
+    private InmoSmart inmoSmart;
 
-    @FXML
-    void ingresarAction() {
-        String email = txtEmail.getText().trim();
-        String password = txtPassword.getText().trim();
-
-        if (email.isEmpty() || password.isEmpty()) {
-            mostrarError("Por favor completa todos los campos.");
-            return;
-        }
-
-        Usuario usuario = SesionGlobal.getInmoSmart().autenticarUsuario(email, password);
-        if (usuario == null) {
-            mostrarError("Correo o contraseña incorrectos.");
-            return;
-        }
-
-        SesionGlobal.setUsuarioActual(usuario);
-        try {
-            if (usuario instanceof Vendedor) {
-                App.navegarA("dashboard-vendedor.fxml");
-            } else if (usuario instanceof Comprador) {
-                App.navegarA("dashboard-comprador.fxml");
-            }
-        } catch (Exception e) {
-            mostrarError("Error al abrir el dashboard: " + e.getMessage());
-        }
+    public LoginController(InmoSmart inmoSmart) {
+        this.inmoSmart = inmoSmart;
     }
 
-    private void mostrarError(String mensaje) {
-        lblError.setText(mensaje);
-        lblError.setVisible(true);
+    public Usuario autenticarUsuario(String email, String password) {
+        return inmoSmart.autenticarUsuario(email, password);
     }
 }

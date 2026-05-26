@@ -7,8 +7,10 @@ module co.edu.uniquindio.poo.simuladorinmobiliaria {
     opens co.edu.uniquindio.poo.simuladorinmobiliaria to javafx.fxml;
     opens co.edu.uniquindio.poo.simuladorinmobiliaria.model to javafx.fxml;
     opens co.edu.uniquindio.poo.simuladorinmobiliaria.controller to javafx.fxml;
+    opens co.edu.uniquindio.poo.simuladorinmobiliaria.viewController to javafx.fxml;
 
     exports co.edu.uniquindio.poo.simuladorinmobiliaria;
     exports co.edu.uniquindio.poo.simuladorinmobiliaria.model;
     exports co.edu.uniquindio.poo.simuladorinmobiliaria.controller;
+    exports co.edu.uniquindio.poo.simuladorinmobiliaria.viewController;
 }
