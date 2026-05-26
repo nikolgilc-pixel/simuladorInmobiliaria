@@ -74,6 +74,19 @@ public class GestorInmuebles {
         return resultado;
     }
 
+    public List<Inmueble> listarTodosLosInmuebles() {
+        return listaInmuebles;
+    }
+
+    public boolean eliminarInmueble(String codigoInmueble) {
+        Inmueble inmueble = buscarInmueblePorCodigo(codigoInmueble);
+        if (inmueble != null) {
+            listaInmuebles.remove(inmueble);
+            return true;
+        }
+        return false;
+    }
+
     // Agrega una oferta al inmueble: verifica disponibilidad y no-duplicado (RF03)
     public boolean agregarOferta(Oferta oferta) {
         Inmueble inmueble = buscarInmueblePorCodigo(oferta.getInmueble().getCodigo());

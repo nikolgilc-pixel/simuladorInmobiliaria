@@ -27,7 +27,7 @@ public class GestorPublicacion {
         return new Publicacion(codigo, descripcion, vendedor, inmueble);
     }
 
-    private boolean validarDisponibilidadInmueble(Inmueble inmueble) {
+    public boolean validarDisponibilidadInmueble(Inmueble inmueble) {
         return inmueble.getEstado() == EstadoInmueble.DISPONIBLE;
     }
 
