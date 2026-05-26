@@ -1,86 +1,128 @@
 package co.edu.uniquindio.poo.simuladorinmobiliaria.model;
 
-import lombok.Setter;
+import co.edu.uniquindio.poo.simuladorinmobiliaria.model.Enum.TipoInmueble;
+import lombok.Getter;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
-@Setter
+@Getter
 public class GestorUsuarios {
-    //Atributos
+    private List<Usuario> listaUsuarios;
 
-    //Relaciones
-    private ArrayList <Usuario> listaUsuarios;
-    private InmoSmart ownedByInmoSmart;
-
-    public GestorUsuarios () {
-            this.listaUsuarios = new ArrayList<>();
+    public GestorUsuarios() {
+        this.listaUsuarios = new ArrayList<>();
     }
 
-    //RegistrarUsuario
-    public String registrarUsuario(Usuario usuario) {
-        if (usuario == null) {
-            return "ERROR: El usuario no puede ser nulo.";
-        }
+    // ---------- Operaciones genéricas ----------------------------------------------------------
 
-        if (buscarUsuario(usuario.getId()) != null) {
-            return "ERROR: Ya existe un usuario con la identificación " + usuario.getId() + ".";
-        }
-
-        this.listaUsuarios.add(usuario);
-        return "ÉXITO: Usuario registrado correctamente.";
-    }
-
-    //buscar el usuario
-    public Usuario buscarUsuario(String id) {
-        if (id == null || id.isBlank()) return null;
-
+    public String añadirUsuario(Usuario usuario) {
         for (Usuario u : listaUsuarios) {
-            if (u.getId().equals(id)) {
+            if (u.getId().equals(usuario.getId())) {
+                return null;
+            }
+        }
+        listaUsuarios.add(usuario);
+        return usuario.getId();
+    }
+
+    public Usuario buscarUsuario(String idUsuario) {
+        for (Usuario u : listaUsuarios) {
+            if (u.getId().equals(idUsuario)) {
                 return u;
             }
         }
         return null;
     }
-    //listar compradores
-    public ArrayList<Comprador> listarCompradores() {
-        ArrayList<Comprador> compradores = new ArrayList<>();
+
+    public Usuario buscarPorEmail(String email) {
+        for (Usuario u : listaUsuarios) {
+            if (u.getEmail().equalsIgnoreCase(email)) {
+                return u;
+            }
+        }
+        return null;
+    }
+
+    public List<Usuario> listarCompradores() {
+        List<Usuario> compradores = new ArrayList<>();
         for (Usuario u : listaUsuarios) {
             if (u instanceof Comprador) {
-                compradores.add((Comprador) u);
+                compradores.add(u);
             }
         }
         return compradores;
     }
 
-    //listarVendedores
-    public ArrayList<Vendedor> listarVendedores() {
-        ArrayList<Vendedor> vendedores = new ArrayList<>();
+    public List<Usuario> listarVendedores() {
+        List<Usuario> vendedores = new ArrayList<>();
         for (Usuario u : listaUsuarios) {
             if (u instanceof Vendedor) {
-                vendedores.add((Vendedor) u);
+                vendedores.add(u);
             }
         }
         return vendedores;
     }
 
-    //listarUsuarios
-    public ArrayList<Usuario> listarUsuarios() {
-        return this.listaUsuarios;
-    }
+    // ── CRUD Comprador ────────────────────────────────────────────────────────
 
-    //eliminarUsuario
-    public void eliminarUsuario(String id) {
-        Usuario encontrado = buscarUsuario(id);
-
-        if (encontrado != null) {
-            this.listaUsuarios.remove(encontrado);
-            System.out.println("Usuario con ID " + id + " eliminado con éxito.");
-        } else {
-            System.out.println("Error: El usuario no existe en el sistema.");
+    public String registrarComprador(String nombre, String telefono, String email,
+                                     String password, double presupuesto, String ciudad,
+                                     TipoInmueble tipoInteres, double areaMin) {
+        if (buscarPorEmail(email) != null) {
+            return "Error: ya existe un usuario con ese correo.";
         }
+        String id = "C" + UUID.randomUUID().toString().substring(0, 6).toUpperCase();
+        Comprador c = new Comprador(id, nombre, telefono, email, password,
+                LocalDate.now(), presupuesto, ciudad, tipoInteres, areaMin);
+        listaUsuarios.add(c);
+        return "Registro exitoso. Ya puedes iniciar sesion.";
     }
+
+    public boolean eliminarComprador(String idComprador) {
+        for (Usuario u : listaUsuarios) {
+            if (u.getId().equals(idComprador) && u instanceof Comprador) {
+                listaUsuarios.remove(u);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // ── CRUD Vendedor ─────────────────────────────────────────────────────────
+
+    public String registrarVendedor(String nombre, String telefono, String email, String password) {
+        if (buscarPorEmail(email) != null) {
+            return "Error: ya existe un usuario con ese correo.";
+        }
+        String id = "V" + UUID.randomUUID().toString().substring(0, 6).toUpperCase();
+        Vendedor v = new Vendedor(id, nombre, telefono, email, password, LocalDate.now());
+        listaUsuarios.add(v);
+        return "Vendedor " + v.getNombreCompleto() + " creado correctamente.";
+    }
+
+    public boolean eliminarVendedor(String idVendedor) {
+        for (Usuario u : listaUsuarios) {
+            if (u.getId().equals(idVendedor) && u instanceof Vendedor) {
+                listaUsuarios.remove(u);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // ── Gestión de contraseña ─────────────────────────────────────────────────
+
+    // Recibe el objeto del propio usuario; solo el controlador del usuario activo
+    // debe invocar este método, garantizando que nadie cambie claves ajenas.
+    public String cambiarContrasena(Usuario usuario, String nuevaContrasena) {
+        if (nuevaContrasena == null || nuevaContrasena.trim().isEmpty()) {
+            return "Error: la nueva contrasena no puede estar vacia.";
+        }
+        usuario.setPassword(nuevaContrasena.trim());
+        return "Contrasena actualizada correctamente.";
+    }
+
 }
-
-
-
-

@@ -1,140 +1,90 @@
 package co.edu.uniquindio.poo.simuladorinmobiliaria.model;
 
 import co.edu.uniquindio.poo.simuladorinmobiliaria.model.Enum.AccionInmobiliaria;
+import co.edu.uniquindio.poo.simuladorinmobiliaria.model.Enum.CausaPenalizacion;
 import co.edu.uniquindio.poo.simuladorinmobiliaria.model.Enum.EstadoInmueble;
 import lombok.Getter;
-import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Getter
-@Setter
 public class GestorPublicacion {
-    //Atributos
-    private int codigo;
-
-    //relaciones
     private List<Publicacion> listaPublicaciones;
-    private InmoSmart ownedByInmoSmart;
 
     public GestorPublicacion() {
-        this.codigo= 1;
-        this.listaPublicaciones= new ArrayList<>();
+        this.listaPublicaciones = new ArrayList<>();
     }
 
-    //crear publicacion
+    // Crea el objeto Publicacion si el inmueble está disponible
+    public Publicacion crearPublicacion(Vendedor vendedor, Inmueble inmueble, String descripcion) {
+        if (!validarDisponibilidadInmueble(inmueble)) {
+            return null;
+        }
+        String codigo = UUID.randomUUID().toString();
+        return new Publicacion(codigo, descripcion, vendedor, inmueble);
+    }
 
-    public Optional<Publicacion> crearPublicacion (Vendedor v, Inmueble i, String descripcion){
+    private boolean validarDisponibilidadInmueble(Inmueble inmueble) {
+        return inmueble.getEstado() == EstadoInmueble.DISPONIBLE;
+    }
 
-        if (validarDisponilibilidad(i)){
-            this.codigo++;
-            String nuevoCodigo= "PUB-" + this.codigo;
-            Publicacion nueva = new Publicacion(nuevoCodigo, descripcion, v, i);
-            añadirPublicacion(nueva);
-            return Optional.of(nueva);
+    // Agrega la publicación si no existe ya; vincula inmueble y suma puntos al vendedor
+    public boolean añadirPublicacion(Publicacion publicacion) {
+        for (Publicacion p : listaPublicaciones) {
+            if (p.getCodigo().equals(publicacion.getCodigo())) {
+                return false;
+            }
+        }
+        Vendedor vendedor = publicacion.getVendedor();
+        for (Publicacion p : vendedor.getListaPublicaciones()) {
+            if (p.getCodigo().equals(publicacion.getCodigo())) {
+                return false;
+            }
+        }
+        listaPublicaciones.add(publicacion);
+        vendedor.getListaPublicaciones().add(publicacion);
+        publicacion.getInmueble().setPublicacion(publicacion);
+        vendedor.sumarPuntos(AccionInmobiliaria.PUBLICAR);
+        return true;
+    }
 
+    public Optional<Publicacion> buscarPublicacion(String codigoPublicacion) {
+        for (Publicacion p : listaPublicaciones) {
+            if (p.getCodigo().equals(codigoPublicacion)) {
+                return Optional.of(p);
+            }
         }
         return Optional.empty();
     }
 
-    //validadDisponibilidad
-
-    public boolean validarDisponilibilidad (Inmueble i){
-        if (i==null)  return false;
-        if (!i.getEstado().equals(EstadoInmueble.DISPONIBLE)){
-                return false;
-            }
-        for (Publicacion p: this.listaPublicaciones){
-            if (p.getInmueble() != null && p.getInmueble().equals(i)){
-                return false;
-            }
-        }
-        return true;
-    }
-
-    //Añadir publicacion
-    public boolean añadirPublicacion (Publicacion p){
-        if (p!= null|| p.getVendedor()==null) {
+    // Retira la publicación del catálogo al cerrar una transacción (sin penalización)
+    public boolean finalizarPublicacion(String codigoPublicacion) {
+        Optional<Publicacion> opt = buscarPublicacion(codigoPublicacion);
+        if (!opt.isPresent()) {
             return false;
         }
-        Vendedor vendedor= p.getVendedor();
-
-        boolean existeEnGestor = this.listaPublicaciones.contains(p);
-        boolean existeEnVendedor = vendedor.getListaPublicaciones() != null &&
-                vendedor.getListaPublicaciones().contains(p);
-
-        if (existeEnGestor || existeEnVendedor) {
-            return false; //
-        }
-
-        this.listaPublicaciones.add(p);
-        if (vendedor.getListaPublicaciones() != null) {
-            vendedor.getListaPublicaciones().add(p);
-        }
-
-        vendedor.sumarPuntos(AccionInmobiliaria.PUBLICAR);
-
+        Publicacion p = opt.get();
+        listaPublicaciones.remove(p);
+        p.getVendedor().getListaPublicaciones().remove(p);
         return true;
     }
 
-    //buscar publicacion
-    public Optional<Publicacion> buscarPublicacion(String codigoPublicacion) {
-
-
-        if (codigoPublicacion == null || codigoPublicacion.isBlank()) {
-            return Optional.empty(); // Devuelve una cajita vacía si no hay código valido
-        }
-
-        for (Publicacion p : this.listaPublicaciones) {
-            if (p.getCodigo().equalsIgnoreCase(codigoPublicacion)) {
-                return Optional.of(p); // ¡La encontramos! La metemos en la cajita y la retornamos
-            }
-        }
-        return Optional.empty();
-    }
-
-    //Cerrar publicacion
-    public boolean finalizarPublicacion(String codigoPublicacion) {
-        Optional<Publicacion> encontrada = buscarPublicacion(codigoPublicacion);
-
-        if (encontrada.isPresent()) {
-            Publicacion p = encontrada.get();
-            if (p.getInmueble() != null) {
-                p.getInmueble().setEstado(EstadoInmueble.VENDIDO);
-            }
-
-            this.listaPublicaciones.remove(p);
-
-            return true;
-        }
-        return false;
-    }
-
+    // Elimina la publicación por solicitud del vendedor; penaliza si el inmueble no está vendido
     public boolean eliminarPublicacion(String codigoPublicacion) {
-        Optional<Publicacion> encontrada = buscarPublicacion(codigoPublicacion);
-
-        if (encontrada.isPresent()) {
-            Publicacion p = encontrada.get();
-            Vendedor vendedor = p.getVendedor();
-            if (p.getInmueble() != null) {
-                p.getInmueble().setEstado(EstadoInmueble.DISPONIBLE);
-            }
-
-            this.listaPublicaciones.remove(p);
-
-            if (vendedor != null && vendedor.getListaPublicaciones() != null) {
-                vendedor.getListaPublicaciones().remove(p);
-            }
-            return true;
+        Optional<Publicacion> opt = buscarPublicacion(codigoPublicacion);
+        if (!opt.isPresent()) {
+            return false;
         }
-        return false;
+        Publicacion p = opt.get();
+        Vendedor vendedor = p.getVendedor();
+        if (p.getInmueble().getEstado() != EstadoInmueble.VENDIDO) {
+            vendedor.quitarPuntos(CausaPenalizacion.ELIMINAR_PUBLICACION_SIN_VENTA);
+        }
+        listaPublicaciones.remove(p);
+        vendedor.getListaPublicaciones().remove(p);
+        return true;
     }
-
-
-
-
-
-
 }

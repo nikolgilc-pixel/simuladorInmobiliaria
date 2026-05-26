@@ -2,30 +2,37 @@ package co.edu.uniquindio.poo.simuladorinmobiliaria.model;
 
 import co.edu.uniquindio.poo.simuladorinmobiliaria.model.Enum.EstadoOferta;
 import lombok.Getter;
-import lombok.Setter;
 
-import java.time.LocalDate;
+import java.time.Instant;
+import java.util.UUID;
+
 @Getter
-@Setter
 public class Oferta {
-    //Atributos
     private String codigo;
     private double valor;
-    private LocalDate fecha;
+    private Instant fecha;
     private EstadoOferta estadoOferta;
-
-    //Relaciones
-
-    private Inmueble ownedByInmueble;
+    private Inmueble inmueble;
     private Comprador comprador;
 
-    public Oferta(String codigo, double valor,  Comprador comprador, Inmueble ownedByInmueble) {
-        this.codigo = codigo;
+    public Oferta(Comprador comprador, Inmueble inmueble, double valor) {
+        this.codigo = UUID.randomUUID().toString();
         this.valor = valor;
-        this.fecha = LocalDate.now();
+        this.fecha = Instant.now();
         this.estadoOferta = EstadoOferta.PENDIENTE;
-        this.ownedByInmueble= ownedByInmueble;
-        this.comprador= comprador;
+        this.inmueble = inmueble;
+        this.comprador = comprador;
+    }
 
+    public void actualizarEstado(EstadoOferta nuevoEstado) {
+        this.estadoOferta = nuevoEstado;
+    }
+
+    @Override
+    public String toString() {
+        return "Oferta{codigo='" + codigo + "', valor=" + valor +
+                ", estado=" + estadoOferta +
+                ", inmueble=" + inmueble.getCodigo() +
+                ", comprador=" + comprador.getId() + '}';
     }
 }
