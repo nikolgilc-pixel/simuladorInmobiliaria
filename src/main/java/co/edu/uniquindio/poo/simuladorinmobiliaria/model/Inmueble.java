@@ -8,32 +8,27 @@ import lombok.Setter;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
+
 @Getter
 @Setter
-
 public class Inmueble {
-    //Atributos
     private String codigo;
     private String direccion;
     private String ciudad;
     private double area;
     private double precio;
     private String descripcion;
-    private LocalDate fechaPublicacion;
+    private LocalDate fechaRegistro;
     private TipoInmueble tipoInmueble;
     private EstadoInmueble estado;
-
-
-    //Relaciones
     private Vendedor vendedorAsignado;
     private List<Oferta> listaOfertas;
     private Publicacion publicacion;
-    private GestorInmuebles ownedByGestorInmuebles;
 
-
-    public Inmueble(String codigo, String direccion, String ciudad, double area,
-                    double precio, String descripcion, TipoInmueble tipoInmueble) {
-        this.codigo = codigo;
+    public Inmueble(String direccion, String ciudad, double area, double precio,
+                    String descripcion, TipoInmueble tipoInmueble) {
+        this.codigo = UUID.randomUUID().toString();
         this.direccion = direccion;
         this.ciudad = ciudad;
         this.area = area;
@@ -41,9 +36,11 @@ public class Inmueble {
         this.descripcion = descripcion;
         this.tipoInmueble = tipoInmueble;
         this.estado = EstadoInmueble.DISPONIBLE;
-        this.fechaPublicacion = LocalDate.now();
+        this.fechaRegistro = LocalDate.now();
         this.listaOfertas = new ArrayList<>();
     }
 
-
+    public void actualizarEstadoInmueble(EstadoInmueble nuevoEstado) {
+        this.estado = nuevoEstado;
+    }
 }

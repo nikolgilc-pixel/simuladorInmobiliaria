@@ -1,185 +1,160 @@
 package co.edu.uniquindio.poo.simuladorinmobiliaria.model;
 
+import co.edu.uniquindio.poo.simuladorinmobiliaria.model.Enum.AccionInmobiliaria;
+import co.edu.uniquindio.poo.simuladorinmobiliaria.model.Enum.EstadoInmueble;
 import co.edu.uniquindio.poo.simuladorinmobiliaria.model.Enum.EstadoOferta;
+import co.edu.uniquindio.poo.simuladorinmobiliaria.model.Enum.TipoOperacion;
 import lombok.Getter;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Getter
 public class InmoSmart {
-
-    //Atributos
     private String codigoComercio;
-
-     // Relaciones
-    private GestorNotificaciones gestorNotificaciones;
     private GestorUsuarios gestorUsuarios;
-    private IServicioBusqueda iServicioBusqueda;
-    private GestorReportes gestorReportes;
-    private GestorTransacciones gestorTransacciones;
     private GestorInmuebles gestorInmuebles;
     private GestorPublicacion gestorPublicaciones;
+    private GestorTransacciones gestorTransacciones;
+    private GestorNotificaciones gestorNotificaciones;
+    private GestorReportes gestorReportes;
+    private IServicioBusqueda iServicioBusqueda;
 
-    // Constructor
+    // iServicioBusqueda se inyecta por constructor (RT03); los canales se registran vía agregarCanal
     public InmoSmart(String codigoComercio, IServicioBusqueda iServicioBusqueda) {
         this.codigoComercio = codigoComercio;
-        this.gestorNotificaciones = new GestorNotificaciones(new ArrayList<>());
-        this.gestorUsuarios = new GestorUsuarios();
         this.iServicioBusqueda = iServicioBusqueda;
-        this.gestorReportes = new GestorReportes();
-        this.gestorTransacciones = new GestorTransacciones();
+        this.gestorUsuarios = new GestorUsuarios();
         this.gestorInmuebles = new GestorInmuebles();
         this.gestorPublicaciones = new GestorPublicacion();
+        this.gestorTransacciones = new GestorTransacciones();
+        this.gestorNotificaciones = new GestorNotificaciones();
+        this.gestorReportes = new GestorReportes();
+        // Registro de canales concretos (RT03: inyectados aquí, nunca dentro del gestor)
+        gestorNotificaciones.agregarCanal(new CanalCorreo());
+        gestorNotificaciones.agregarCanal(new CanalSMS());
+        gestorNotificaciones.agregarCanal(new CanalWhatsApp());
     }
 
-    //metodo para buscar inmuebles con filtro
-    public void buscarInmueble() {
-        System.out.println("Catálogo comercial activo en InmoSmart:");
-        if (gestorPublicaciones.getListaPublicaciones() == null || gestorPublicaciones.getListaPublicaciones().isEmpty()) {
-            System.out.println("No hay publicaciones activas en este momento.");
+    // RF03: crea la oferta, la vincula al inmueble, notifica al vendedor y suma puntos
+    public void tramitarOferta(Comprador comprador, Inmueble inmueble, double monto) {
+        if (monto <= 0 || inmueble.getEstado() != EstadoInmueble.DISPONIBLE) {
             return;
         }
-        for (Publicacion pub : gestorPublicaciones.getListaPublicaciones()) {
-            if (pub.getInmueble() != null) {
-                System.out.println("- [" + pub.getCodigo() + "] - Tipo: " + pub.getInmueble().getTipoInmueble()
-                        + " en " + pub.getInmueble().getCiudad() + " | Precio: $" + pub.getInmueble().getPrecio());
-            }
-        }
-    }
-
-    //buscarInmuebleFiltro
-    public List<Publicacion> buscarInmuebleFiltro(Comprador comprador, FiltroBusqueda filtroBusqueda) {
-        if (comprador != null && filtroBusqueda != null) {
-            comprador.setHistorialIntereses(filtroBusqueda);
-        }
-        List<Publicacion> listaPublicaciones = this.gestorPublicaciones.getListaPublicaciones();
-        if (this.iServicioBusqueda != null) {
-            return this.iServicioBusqueda.buscarPublicaciones(listaPublicaciones, filtroBusqueda);
-        }
-        return new ArrayList<>();
-    }
-
-    //consultarCatalogo
-    public List<Publicacion> consultarCatalogo(FiltroBusqueda filtros) {
-        if (this.iServicioBusqueda != null && filtros != null) {
-            return this.iServicioBusqueda.buscarPublicaciones(this.gestorPublicaciones.getListaPublicaciones(), filtros);
-        }
-        return this.gestorPublicaciones.getListaPublicaciones();
-    }
-
-    //procesarSolicitudPublicacion
-    public String procesarSolicitudPublicacion(Vendedor v, Inmueble i, String descripcion) {
-        if (v == null || i == null) {
-            return "Error: Vendedor o Inmueble inválidos.";
-        }
-
-        Optional<Publicacion> nuevaPub = gestorPublicaciones.crearPublicacion(v, i, descripcion);
-        if (nuevaPub.isPresent()) {
-            // Sincronizamos la publicación en la lista interna del vendedor
-            if (v.getListaPublicaciones() != null && !v.getListaPublicaciones().contains(nuevaPub.get())) {
-                v.getListaPublicaciones().add(nuevaPub.get());
-            }
-            return "Éxito: Publicación " + nuevaPub.get().getCodigo() + " creada correctamente.";
-        }
-        return "Error: El inmueble no está disponible para publicar (ya vendido o en proceso).";
-    }
-
-    //v
-    public String procesarEliminacionPublicacion(Vendedor v, String codigoPublicacion) {
-        boolean eliminada = gestorPublicaciones.eliminarPublicacion(codigoPublicacion);
-        if (eliminada) {
-            return "🗑️ Éxito: La publicación " + codigoPublicacion + " ha sido retirada.";
-        }
-        return "Error: No se encontró la publicación o no se pudo eliminar.";
-    }
-
-    //vincularInmuebleAVendedor
-    public String vincularInmuebleAVendedor(Inmueble i, Vendedor v) {
-        if (i == null || v == null) {
-            return "Error: Datos nulos.";
-        }
-        i.setVendedorAsignado(v);
-        if (v.getListaInmuebles() != null && !v.getListaInmuebles().contains(i)) {
-            v.getListaInmuebles().add(i);
-        }
-        return "Éxito: Inmueble asignado al portafolio de " + v.getNombreCompleto();
-    }
-
-    //tramitarOferta
-    public void tramitarOferta(Oferta o) {
-        if (o == null || o.getOwnedByInmueble() == null) return;
-
-        // Agregamos la oferta usando el gestor de inmuebles
-        boolean agregada = gestorInmuebles.agregarOferta(o);
-
+        Oferta nuevaOferta = new Oferta(comprador, inmueble, monto);
+        boolean agregada = gestorInmuebles.agregarOferta(nuevaOferta);
         if (agregada) {
-            Inmueble inmueble = o.getOwnedByInmueble();
-            Vendedor vendedor = inmueble.getVendedorAsignado();
-
-            // Si el inmueble tiene un vendedor asignado se le envia la alerta automática
-            if (vendedor != null && gestorNotificaciones != null) {
-                gestorNotificaciones.crearNotificacionNuevaOferta(vendedor, inmueble, o.getComprador(), o.getValor());
-            }
+            comprador.getListaOfertas().add(nuevaOferta);
+            comprador.sumarPuntos(AccionInmobiliaria.OFERTAR);
+            gestorNotificaciones.crearNotificacionNuevaOferta(inmueble.getVendedorAsignado(), inmueble);
         }
     }
 
-    //procesarCierreOferta
-    public void procesarCierreOferta(Oferta aceptada) {
-        if (aceptada == null || aceptada.getOwnedByInmueble() == null) return;
-
-        Inmueble inmueble = aceptada.getOwnedByInmueble();
+    // RF04: cierre atómico — acepta la oferta, rechaza las demás, crea transacción,
+    //        actualiza el inmueble, retira la publicación y otorga puntos a ambas partes
+    public void procesarCierreOferta(Oferta ofertaAceptada, TipoOperacion tipoOperacion) {
+        Inmueble inmueble = ofertaAceptada.getInmueble();
+        Comprador comprador = ofertaAceptada.getComprador();
         Vendedor vendedor = inmueble.getVendedorAsignado();
 
-        //modificamos el estado de la oferta
-        aceptada.setEstadoOferta(EstadoOferta.ACEPTADA);
-
-        // actualizamos la info con ek metodo creado en vendedor
-        if (vendedor != null) {
-            vendedor.aceptarOferta(aceptada);
+        // 1. Rechazar todas las demás ofertas pendientes y notificar a esos compradores
+        for (Oferta o : inmueble.getListaOfertas()) {
+            if (!o.getCodigo().equals(ofertaAceptada.getCodigo())
+                    && o.getEstadoOferta() == EstadoOferta.PENDIENTE) {
+                o.actualizarEstado(EstadoOferta.RECHAZADA);
+                gestorNotificaciones.crearNotificacionOfertaAceptada(o.getComprador(), inmueble);
+            }
         }
 
-        // s notifica al comprador q su oferta fue aceptada
-        if (aceptada.getComprador() != null && gestorNotificaciones != null) {
-            gestorNotificaciones.crearNotificacionOfertaAceptada(aceptada.getComprador(), inmueble);
-        }
-        procesarTransaccion(aceptada);
+        // 2. Marcar la oferta como aceptada
+        ofertaAceptada.actualizarEstado(EstadoOferta.ACEPTADA);
 
-        // se finaliza y elimina la publicacion
+        // 3. Crear la transacción inmutable
+        Transaccion transaccion;
+        if (tipoOperacion == TipoOperacion.VENTA) {
+            transaccion = gestorTransacciones.registrarVenta(ofertaAceptada);
+            inmueble.actualizarEstadoInmueble(EstadoInmueble.VENDIDO);
+            vendedor.aceptarOferta(ofertaAceptada);
+        } else {
+            transaccion = gestorTransacciones.registrarArriendo(ofertaAceptada);
+            inmueble.actualizarEstadoInmueble(EstadoInmueble.ARRENDADO);
+            vendedor.registrarArriendo();
+        }
+
+        // 4. Retirar del catálogo público
         if (inmueble.getPublicacion() != null) {
             gestorPublicaciones.finalizarPublicacion(inmueble.getPublicacion().getCodigo());
         }
+
+        // 5. Sumar puntos a ambas partes
+        vendedor.sumarPuntos(AccionInmobiliaria.COMPLETAR_TRANSACCION);
+        comprador.sumarPuntos(AccionInmobiliaria.COMPLETAR_TRANSACCION);
+        if (transaccion.tipoOperacion() == TipoOperacion.VENTA) {
+            comprador.sumarPuntos(AccionInmobiliaria.COMPRAR);
+        }
+
+        // 6. Notificar al comprador ganador
+        gestorNotificaciones.crearNotificacionOfertaAceptada(comprador, inmueble);
     }
 
-    //procesarTransaccion
+    // RF02: delega la búsqueda al motor inyectado y actualiza el historial del comprador
+    public List<Publicacion> consultarCatalogo(Comprador comprador, FiltroBusqueda filtros) {
+        comprador.actualizarHistorial(filtros);
+        return iServicioBusqueda.buscarPublicaciones(gestorPublicaciones.getListaPublicaciones(), filtros);
+    }
+
+    // RF05 (recomendaciones): usa el historialIntereses actual del comprador
+    public List<Publicacion> obtenerSugerencias(Comprador comprador) {
+        return iServicioBusqueda.buscarPublicaciones(
+                gestorPublicaciones.getListaPublicaciones(),
+                comprador.getHistorialIntereses()
+        );
+    }
+
+    // Publica un inmueble: crea la publicación y la agrega al catálogo
+    public String procesarSolicitudPublicacion(Vendedor vendedor, Inmueble inmueble, String descripcion) {
+        Publicacion p = gestorPublicaciones.crearPublicacion(vendedor, inmueble, descripcion);
+        if (p == null) {
+            return "Error: el inmueble no está disponible para publicar.";
+        }
+        boolean añadida = gestorPublicaciones.añadirPublicacion(p);
+        if (!añadida) {
+            return "Error: la publicación ya existe.";
+        }
+        return "Publicación creada: " + p.getCodigo();
+    }
+
+    // Retira una publicación por solicitud del vendedor
+    public String procesarEliminacionPublicacion(Vendedor vendedor, String codigoPublicacion) {
+        boolean eliminada = gestorPublicaciones.eliminarPublicacion(codigoPublicacion);
+        if (!eliminada) {
+            return "Error: no se encontró la publicación.";
+        }
+        return "Publicación eliminada correctamente.";
+    }
+
+    // Vincula un inmueble ya creado a un vendedor y lo registra en el sistema
+    public String vincularInmuebleAVendedor(Inmueble inmueble, Vendedor vendedor) {
+        inmueble.setVendedorAsignado(vendedor);
+        vendedor.getListaInmuebles().add(inmueble);
+        gestorInmuebles.añadirInmueble(inmueble);
+        return "Inmueble " + inmueble.getCodigo() + " vinculado a " + vendedor.getNombreCompleto();
+    }
+
+    // RF06: delega la generación de reportes al gestor correspondiente
+    public void buscarInmueble() {
+        // El controlador construye el FiltroBusqueda y llama a consultarCatalogo()
+    }
+
     public void procesarTransaccion(Oferta oferta) {
-        if (oferta == null || gestorTransacciones == null) return;
-
-        Transaccion t;
-
-        // Aquí interactuamos con el GestorTransacciones según los métodos definidos en tu diagrama XML
-        // Si tu modelo maneja tipos de operación específicos, el gestor creará el registro correspondiente
-        if (oferta.getOwnedByInmueble().getPrecio() > 0) {
-            t = gestorTransacciones.registrarVenta(oferta);
-        } else {
-            t = gestorTransacciones.registrarArriendo(oferta);
-        }
-
-        if (t != null) {
-            System.out.println("[Transacción Registrada] Código: " + t.codigo() + " | Total: $" + t.valorFinal());
-        }
+        procesarCierreOferta(oferta, TipoOperacion.VENTA);
     }
 
-    // segurencias
-    public List<Publicacion> obtenerSugerencias(Comprador c) {
-        List<Publicacion> sugerencias = new ArrayList<>();
-        if (c == null || c.getHistorialIntereses() == null) {
-            return sugerencias;
+    public Usuario autenticarUsuario(String email, String password) {
+        for (Usuario u : gestorUsuarios.getListaUsuarios()) {
+            if (u.getEmail().equals(email) && u.getPassword().equals(password)) {
+                return u;
+            }
         }
-        // se crea el catálogo aplicando el registro de FiltroBusqueda que el comprador tiene guardado
-        return consultarCatalogo(c.getHistorialIntereses());
+        return null;
     }
 }
-
-

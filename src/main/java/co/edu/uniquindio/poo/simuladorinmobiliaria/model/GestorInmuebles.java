@@ -1,138 +1,104 @@
 package co.edu.uniquindio.poo.simuladorinmobiliaria.model;
 
 import co.edu.uniquindio.poo.simuladorinmobiliaria.model.Enum.EstadoInmueble;
+import co.edu.uniquindio.poo.simuladorinmobiliaria.model.Enum.EstadoOferta;
 import co.edu.uniquindio.poo.simuladorinmobiliaria.model.Enum.TipoInmueble;
+import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Getter
 public class GestorInmuebles {
-    // Relaciones
     private List<Inmueble> listaInmuebles;
-    private InmoSmart ownedByInmoSmart;
 
-    // Constructor inicializando la lista vacía
     public GestorInmuebles() {
         this.listaInmuebles = new ArrayList<>();
     }
 
-    //registrar Inmueble
-    public Inmueble registrarNuevoInmueble(String codigo, String direccion, String ciudad, double area,
-                                           double precio, String descripcion, TipoInmueble tipoInmueble) {
-
-        // verificar si ya existe o no
-        if (buscarInmueblePorCodigo(codigo) != null) {
-            System.out.println("Error: Ya existe un inmueble registrado con el código " + codigo);
-            return null;
-        }
-
-        Inmueble nuevoInmueble = new Inmueble(codigo, direccion, ciudad, area, precio, descripcion, tipoInmueble);
-
-        // al crear el inmueble por primera vez se le asignara el estado de disponible
-        nuevoInmueble.setEstado(EstadoInmueble.DISPONIBLE);
-        nuevoInmueble.setOwnedByGestorInmuebles(this);
-        añadirInmueble(nuevoInmueble);
-
-        return nuevoInmueble;
+    // Crea y registra un nuevo inmueble con código generado automáticamente (UUID)
+    public Inmueble registrarNuevoInmueble(String direccion, String ciudad, double area,
+                                           double precio, String descripcion, TipoInmueble tipo) {
+        Inmueble nuevo = new Inmueble(direccion, ciudad, area, precio, descripcion, tipo);
+        listaInmuebles.add(nuevo);
+        return nuevo;
     }
 
-    //añadir inmueble
-    public boolean añadirInmueble(Inmueble nuevo) {
-        if (nuevo != null && !this.listaInmuebles.contains(nuevo)) {
-            this.listaInmuebles.add(nuevo);
-            return true;
+    public boolean añadirInmueble(Inmueble inmueble) {
+        for (Inmueble i : listaInmuebles) {
+            if (i.getCodigo().equals(inmueble.getCodigo())) {
+                return false;
+            }
         }
-        return false;
+        listaInmuebles.add(inmueble);
+        return true;
     }
 
-    // buscarInmueble
     public Inmueble buscarInmueblePorCodigo(String codigoInmueble) {
-        if (codigoInmueble == null || codigoInmueble.isBlank()) {
-            return null;
-        }
-
-        for (Inmueble inm : listaInmuebles) {
-            if (inm.getCodigo().equalsIgnoreCase(codigoInmueble)) {
-                return inm;
+        for (Inmueble i : listaInmuebles) {
+            if (i.getCodigo().equals(codigoInmueble)) {
+                return i;
             }
         }
         return null;
     }
 
-    // listarInmueblesDisponibles
     public List<Inmueble> listarInmueblesDisponibles() {
         List<Inmueble> disponibles = new ArrayList<>();
-        for (Inmueble inm : listaInmuebles) {
-            if (inm.getEstado() == EstadoInmueble.DISPONIBLE) {
-                disponibles.add(inm);
+        for (Inmueble i : listaInmuebles) {
+            if (i.getEstado() == EstadoInmueble.DISPONIBLE) {
+                disponibles.add(i);
             }
         }
         return disponibles;
     }
 
-    //listarInmueblesPorTipo
     public List<Inmueble> listarInmueblesPorTipo(TipoInmueble tipo) {
-        List<Inmueble> filtrados = new ArrayList<>();
-        if (tipo == null) return filtrados;
-
-        for (Inmueble inm : listaInmuebles) {
-            if (inm.getTipoInmueble() == tipo) {
-                filtrados.add(inm);
+        List<Inmueble> resultado = new ArrayList<>();
+        for (Inmueble i : listaInmuebles) {
+            if (i.getTipoInmueble() == tipo) {
+                resultado.add(i);
             }
         }
-        return filtrados;
+        return resultado;
     }
 
-    //listarInmueblesPorVendedor
     public List<Inmueble> listarInmueblesPorVendedor(String idVendedor) {
-        List<Inmueble> porVendedor = new ArrayList<>();
-        if (idVendedor == null || idVendedor.isBlank()) return porVendedor;
-
-        for (Inmueble inm : listaInmuebles) {
-            if (inm.getVendedorAsignado() != null && inm.getVendedorAsignado().getId().equals(idVendedor)) {
-                porVendedor.add(inm);
+        List<Inmueble> resultado = new ArrayList<>();
+        for (Inmueble i : listaInmuebles) {
+            if (i.getVendedorAsignado() != null &&
+                    i.getVendedorAsignado().getId().equals(idVendedor)) {
+                resultado.add(i);
             }
         }
-        return porVendedor;
+        return resultado;
     }
 
-    //listarTodosLosInmuebles
     public List<Inmueble> listarTodosLosInmuebles() {
-        return this.listaInmuebles;
+        return listaInmuebles;
     }
 
-    //eliminarInmueble
     public boolean eliminarInmueble(String codigoInmueble) {
-        Inmueble encontrado = buscarInmueblePorCodigo(codigoInmueble);
-        if (encontrado != null) {
-            this.listaInmuebles.remove(encontrado);
-            System.out.println("Inmueble " + codigoInmueble + " eliminado correctamente del sistema.");
+        Inmueble inmueble = buscarInmueblePorCodigo(codigoInmueble);
+        if (inmueble != null) {
+            listaInmuebles.remove(inmueble);
             return true;
         }
         return false;
     }
 
-    //agregarOferta
-    public boolean agregarOferta(Oferta nueva) {
-        if (nueva == null || nueva.getOwnedByInmueble() == null) {
+    // Agrega una oferta al inmueble: verifica disponibilidad y no-duplicado (RF03)
+    public boolean agregarOferta(Oferta oferta) {
+        Inmueble inmueble = buscarInmueblePorCodigo(oferta.getInmueble().getCodigo());
+        if (inmueble == null || inmueble.getEstado() != EstadoInmueble.DISPONIBLE) {
             return false;
         }
-
-        Inmueble inmuebleDestino = nueva.getOwnedByInmueble();
-
-        // Inicializamos la lista de ofertas dentro del inmueble si llega a estar en nulo
-        if (inmuebleDestino.getListaOfertas() == null) {
-            inmuebleDestino.setListaOfertas(new ArrayList<>());
+        for (Oferta o : inmueble.getListaOfertas()) {
+            if (o.getCodigo().equals(oferta.getCodigo())) {
+                return false;
+            }
         }
-
-        // Si la oferta no ha sido agregada todavía, la añadimos
-        if (!inmuebleDestino.getListaOfertas().contains(nueva)) {
-            inmuebleDestino.getListaOfertas().add(nueva);
-            System.out.println("Nueva oferta vinculada exitosamente al inmueble: " + inmuebleDestino.getCodigo());
-            return true;
-        }
-        return false;
+        inmueble.getListaOfertas().add(oferta);
+        return true;
     }
 }
-
-

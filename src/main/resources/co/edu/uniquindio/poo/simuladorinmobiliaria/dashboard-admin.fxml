@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="co.edu.uniquindio.poo.simuladorinmobiliaria.controller.AdminController"
+      prefWidth="1020" prefHeight="700">
+
+    <!-- Barra superior -->
+    <HBox alignment="CENTER_LEFT" spacing="16"
+          style="-fx-background-color: #4A148C; -fx-padding: 12;">
+        <Label text="InmoSmart  —  Panel Administrador"
+               style="-fx-font-size: 18; -fx-font-weight: bold; -fx-text-fill: white;"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Label fx:id="lblNombreAdmin"
+               style="-fx-text-fill: #CE93D8; -fx-font-size: 13;"/>
+        <Button text="Cerrar sesion" onAction="#cerrarSesionAction"
+                style="-fx-background-color: white; -fx-text-fill: #4A148C; -fx-font-weight: bold; -fx-cursor: hand;"/>
+    </HBox>
+
+    <TabPane VBox.vgrow="ALWAYS" tabClosingPolicy="UNAVAILABLE">
+
+        <!-- TAB 1: Crear Vendedor -->
+        <Tab text="Crear Vendedor">
+            <VBox spacing="16" style="-fx-padding: 24;">
+                <Label text="Registrar Nuevo Vendedor"
+                       style="-fx-font-size: 15; -fx-font-weight: bold;"/>
+                <Label text="Solo el Administrador puede dar de alta nuevos Vendedores en el sistema."
+                       style="-fx-font-size: 12; -fx-text-fill: #666;"/>
+                <Separator/>
+                <GridPane hgap="12" vgap="12">
+                    <Label text="Nombre completo:" GridPane.columnIndex="0" GridPane.rowIndex="0"
+                           style="-fx-font-weight: bold;"/>
+                    <TextField fx:id="fNombreVendedor" promptText="Nombre del vendedor" prefWidth="280"
+                               GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+
+                    <Label text="Telefono:" GridPane.columnIndex="0" GridPane.rowIndex="1"
+                           style="-fx-font-weight: bold;"/>
+                    <TextField fx:id="fTelefonoVendedor" promptText="+573XXXXXXXXX" prefWidth="280"
+                               GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+
+                    <Label text="Correo electronico:" GridPane.columnIndex="0" GridPane.rowIndex="2"
+                           style="-fx-font-weight: bold;"/>
+                    <TextField fx:id="fEmailVendedor" promptText="vendedor@correo.com" prefWidth="280"
+                               GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+
+                    <Label text="Contrasena:" GridPane.columnIndex="0" GridPane.rowIndex="3"
+                           style="-fx-font-weight: bold;"/>
+                    <PasswordField fx:id="fPasswordVendedor" promptText="Contrasena inicial" prefWidth="280"
+                                   GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+                </GridPane>
+                <Button text="Crear Vendedor" onAction="#crearVendedorAction"
+                        style="-fx-background-color: #4A148C; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;"/>
+                <Label fx:id="lblMsgVendedor" text="" wrapText="true"
+                       style="-fx-font-size: 13;"/>
+            </VBox>
+        </Tab>
+
+        <!-- TAB 2: Top Tipos de Inmueble -->
+        <Tab text="Top Tipos Transaccionados">
+            <VBox spacing="10" style="-fx-padding: 16;">
+                <HBox alignment="CENTER_LEFT" spacing="10">
+                    <Label text="Tipos de Inmueble mas Transaccionados"
+                           style="-fx-font-size: 15; -fx-font-weight: bold;"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Button text="Actualizar" onAction="#actualizarReportesAction"
+                            style="-fx-cursor: hand;"/>
+                </HBox>
+                <Label text="Conteo de transacciones (ventas + arriendos) agrupado por tipo de inmueble."
+                       style="-fx-font-size: 12; -fx-text-fill: #666;"/>
+                <TableView fx:id="tablaTopTipos" VBox.vgrow="ALWAYS">
+                    <columns>
+                        <TableColumn fx:id="colTipoNombre" text="Tipo de Inmueble" prefWidth="300"/>
+                        <TableColumn fx:id="colTipoConteo" text="Transacciones"    prefWidth="200"/>
+                    </columns>
+                </TableView>
+            </VBox>
+        </Tab>
+
+        <!-- TAB 3: Demanda por Ciudad -->
+        <Tab text="Demanda por Ciudad">
+            <VBox spacing="10" style="-fx-padding: 16;">
+                <HBox alignment="CENTER_LEFT" spacing="10">
+                    <Label text="Demanda de Inmuebles por Ciudad"
+                           style="-fx-font-size: 15; -fx-font-weight: bold;"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Button text="Actualizar" onAction="#actualizarReportesAction"
+                            style="-fx-cursor: hand;"/>
+                </HBox>
+                <Label text="Numero de inmuebles registrados en el sistema por ciudad."
+                       style="-fx-font-size: 12; -fx-text-fill: #666;"/>
+                <TableView fx:id="tablaDemandaCiudad" VBox.vgrow="ALWAYS">
+                    <columns>
+                        <TableColumn fx:id="colDemCiudad"  text="Ciudad"    prefWidth="300"/>
+                        <TableColumn fx:id="colDemConteo"  text="Inmuebles" prefWidth="200"/>
+                    </columns>
+                </TableView>
+            </VBox>
+        </Tab>
+
+        <!-- TAB 4: Top Compradores -->
+        <Tab text="Top Compradores">
+            <VBox spacing="10" style="-fx-padding: 16;">
+                <HBox alignment="CENTER_LEFT" spacing="10">
+                    <Label text="Compradores con Mayor Reputacion"
+                           style="-fx-font-size: 15; -fx-font-weight: bold;"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Button text="Actualizar" onAction="#actualizarReportesAction"
+                            style="-fx-cursor: hand;"/>
+                </HBox>
+                <Label text="Ranking descendente por puntos de reputacion acumulados."
+                       style="-fx-font-size: 12; -fx-text-fill: #666;"/>
+                <TableView fx:id="tablaTopCompradores" VBox.vgrow="ALWAYS">
+                    <columns>
+                        <TableColumn fx:id="colTopNombre" text="Comprador" prefWidth="260"/>
+                        <TableColumn fx:id="colTopPuntos" text="Puntos"    prefWidth="140"/>
+                        <TableColumn fx:id="colTopRango"  text="Rango"     prefWidth="200"/>
+                    </columns>
+                </TableView>
+            </VBox>
+        </Tab>
+
+        <!-- TAB 5: Gestión de Usuarios — solo permite eliminar Vendedores -->
+        <Tab text="Gestion de Usuarios">
+            <VBox spacing="10" style="-fx-padding: 16;">
+                <HBox alignment="CENTER_LEFT" spacing="10">
+                    <Label text="Usuarios del Sistema"
+                           style="-fx-font-size: 15; -fx-font-weight: bold;"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Label text="Filtrar:" style="-fx-font-weight: bold;"/>
+                    <ComboBox fx:id="comboFiltroRol" prefWidth="140"
+                              onAction="#filtrarUsuariosAction"/>
+                    <Button text="Actualizar" onAction="#actualizarReportesAction"
+                            style="-fx-cursor: hand;"/>
+                </HBox>
+                <Label text="Selecciona un Vendedor y pulsa el boton para eliminarlo del sistema."
+                       style="-fx-font-size: 12; -fx-text-fill: #666;"/>
+                <TableView fx:id="tablaUsuarios" VBox.vgrow="ALWAYS">
+                    <columns>
+                        <TableColumn fx:id="colUsuNombre" text="Nombre [Rol]"   prefWidth="300"/>
+                        <TableColumn fx:id="colUsuEmail"  text="Correo"         prefWidth="250"/>
+                        <TableColumn fx:id="colUsuPuntos" text="Puntos / Rango" prefWidth="200"/>
+                    </columns>
+                </TableView>
+                <HBox spacing="10" alignment="CENTER_LEFT">
+                    <Button text="Eliminar Vendedor" onAction="#eliminarVendedorAction"
+                            style="-fx-background-color: #B71C1C; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;"/>
+                </HBox>
+                <Label fx:id="lblMsgUsuarios" text="" wrapText="true"
+                       style="-fx-font-size: 13;"/>
+            </VBox>
+        </Tab>
+
+        <!-- TAB 6: Inventario Disponible -->
+        <Tab text="Inventario Disponible">
+            <VBox spacing="10" style="-fx-padding: 16;">
+                <HBox alignment="CENTER_LEFT" spacing="10">
+                    <Label text="Inventario de Inmuebles Disponibles"
+                           style="-fx-font-size: 15; -fx-font-weight: bold;"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Button text="Actualizar" onAction="#actualizarInventarioAction"
+                            style="-fx-cursor: hand;"/>
+                </HBox>
+                <Label text="Inmuebles con estado DISPONIBLE en todo el sistema, independientemente de si estan publicados."
+                       style="-fx-font-size: 12; -fx-text-fill: #666;" wrapText="true"/>
+                <TableView fx:id="tablaInventario" VBox.vgrow="ALWAYS">
+                    <columns>
+                        <TableColumn fx:id="colInvDireccion" text="Direccion"  prefWidth="220"/>
+                        <TableColumn fx:id="colInvCiudad"    text="Ciudad"     prefWidth="120"/>
+                        <TableColumn fx:id="colInvTipo"      text="Tipo"       prefWidth="110"/>
+                        <TableColumn fx:id="colInvPrecio"    text="Precio COP" prefWidth="150"/>
+                        <TableColumn fx:id="colInvVendedor"  text="Vendedor"   prefWidth="180"/>
+                    </columns>
+                </TableView>
+            </VBox>
+        </Tab>
+
+        <!-- TAB 7: Mi Perfil — el Admin cambia solo su propia contraseña -->
+        <Tab text="Mi Perfil">
+            <VBox spacing="16" style="-fx-padding: 24;">
+                <Label text="Cambiar Mi Contrasena"
+                       style="-fx-font-size: 15; -fx-font-weight: bold;"/>
+                <Label text="Solo puedes modificar tu propia credencial de acceso."
+                       style="-fx-font-size: 12; -fx-text-fill: #666;"/>
+                <Separator/>
+                <GridPane hgap="12" vgap="12">
+                    <Label text="Nueva contrasena:" GridPane.columnIndex="0" GridPane.rowIndex="0"
+                           style="-fx-font-weight: bold;"/>
+                    <PasswordField fx:id="fAdminNuevaPassword" promptText="Nueva contrasena"
+                                   prefWidth="280"
+                                   GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+
+                    <Label text="Confirmar contrasena:" GridPane.columnIndex="0" GridPane.rowIndex="1"
+                           style="-fx-font-weight: bold;"/>
+                    <PasswordField fx:id="fAdminConfirmarPassword" promptText="Repite la contrasena"
+                                   prefWidth="280"
+                                   GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                </GridPane>
+                <Button text="Guardar Nueva Contrasena" onAction="#cambiarMiContrasenaAction"
+                        style="-fx-background-color: #4A148C; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;"/>
+                <Label fx:id="lblMsgPerfil" text="" wrapText="true"
+                       style="-fx-font-size: 13;"/>
+            </VBox>
+        </Tab>
+
+    </TabPane>
+</VBox>
