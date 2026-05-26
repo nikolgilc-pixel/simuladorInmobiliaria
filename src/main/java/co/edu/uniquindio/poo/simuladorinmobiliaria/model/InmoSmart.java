@@ -3,10 +3,13 @@ package co.edu.uniquindio.poo.simuladorinmobiliaria.model;
 import co.edu.uniquindio.poo.simuladorinmobiliaria.model.Enum.AccionInmobiliaria;
 import co.edu.uniquindio.poo.simuladorinmobiliaria.model.Enum.EstadoInmueble;
 import co.edu.uniquindio.poo.simuladorinmobiliaria.model.Enum.EstadoOferta;
+import co.edu.uniquindio.poo.simuladorinmobiliaria.model.Enum.TipoInmueble;
 import co.edu.uniquindio.poo.simuladorinmobiliaria.model.Enum.TipoOperacion;
 import lombok.Getter;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Getter
 public class InmoSmart {
@@ -29,7 +32,6 @@ public class InmoSmart {
         this.gestorTransacciones = new GestorTransacciones();
         this.gestorNotificaciones = new GestorNotificaciones();
         this.gestorReportes = new GestorReportes();
-        // Registro de canales concretos (RT03: inyectados aquí, nunca dentro del gestor)
         gestorNotificaciones.agregarCanal(new CanalCorreo());
         gestorNotificaciones.agregarCanal(new CanalSMS());
         gestorNotificaciones.agregarCanal(new CanalWhatsApp());
@@ -56,7 +58,6 @@ public class InmoSmart {
         Comprador comprador = ofertaAceptada.getComprador();
         Vendedor vendedor = inmueble.getVendedorAsignado();
 
-        // 1. Rechazar todas las demás ofertas pendientes y notificar a esos compradores
         for (Oferta o : inmueble.getListaOfertas()) {
             if (!o.getCodigo().equals(ofertaAceptada.getCodigo())
                     && o.getEstadoOferta() == EstadoOferta.PENDIENTE) {
@@ -65,10 +66,8 @@ public class InmoSmart {
             }
         }
 
-        // 2. Marcar la oferta como aceptada
         ofertaAceptada.actualizarEstado(EstadoOferta.ACEPTADA);
 
-        // 3. Crear la transacción inmutable
         Transaccion transaccion;
         if (tipoOperacion == TipoOperacion.VENTA) {
             transaccion = gestorTransacciones.registrarVenta(ofertaAceptada);
@@ -80,19 +79,17 @@ public class InmoSmart {
             vendedor.registrarArriendo();
         }
 
-        // 4. Retirar del catálogo público
         if (inmueble.getPublicacion() != null) {
             gestorPublicaciones.finalizarPublicacion(inmueble.getPublicacion().getCodigo());
         }
 
-        // 5. Sumar puntos a ambas partes
         vendedor.sumarPuntos(AccionInmobiliaria.COMPLETAR_TRANSACCION);
         comprador.sumarPuntos(AccionInmobiliaria.COMPLETAR_TRANSACCION);
         if (transaccion.tipoOperacion() == TipoOperacion.VENTA) {
             comprador.sumarPuntos(AccionInmobiliaria.COMPRAR);
         }
 
-        // 6. Notificar al comprador ganador
+        comprador.getHistorialTransacciones().add(transaccion);
         gestorNotificaciones.crearNotificacionOfertaAceptada(comprador, inmueble);
     }
 
@@ -110,26 +107,75 @@ public class InmoSmart {
         );
     }
 
-    // Publica un inmueble: crea la publicación y la agrega al catálogo
+    // Publica un inmueble: crea la publicación, la agrega al catálogo y notifica compradores coincidentes
     public String procesarSolicitudPublicacion(Vendedor vendedor, Inmueble inmueble, String descripcion) {
         Publicacion p = gestorPublicaciones.crearPublicacion(vendedor, inmueble, descripcion);
         if (p == null) {
-            return "Error: el inmueble no está disponible para publicar.";
+            return "Error: el inmueble no esta disponible para publicar.";
         }
         boolean añadida = gestorPublicaciones.añadirPublicacion(p);
         if (!añadida) {
-            return "Error: la publicación ya existe.";
+            return "Error: la publicacion ya existe.";
         }
-        return "Publicación creada: " + p.getCodigo();
+        for (Usuario u : gestorUsuarios.listarCompradores()) {
+            Comprador c = (Comprador) u;
+            if (inmuebleCoincideConIntereses(inmueble, c.getHistorialIntereses())) {
+                gestorNotificaciones.crearNotificacionInmuebleSimilar(c, inmueble);
+            }
+        }
+        return "Publicacion creada: " + p.getCodigo();
+    }
+
+    // Cambia el precio de un inmueble y notifica a todos los compradores con intereses coincidentes
+    public String actualizarPrecioInmueble(Inmueble inmueble, double nuevoPrecio) {
+        if (nuevoPrecio <= 0) {
+            return "Error: el precio debe ser mayor a cero.";
+        }
+        double precioAnterior = inmueble.getPrecio();
+        inmueble.setPrecio(nuevoPrecio);
+        int notificados = 0;
+        for (Usuario u : gestorUsuarios.listarCompradores()) {
+            Comprador c = (Comprador) u;
+            if (inmuebleCoincideConIntereses(inmueble, c.getHistorialIntereses())) {
+                gestorNotificaciones.crearNotificacionCambioPrecio(c, inmueble);
+                notificados++;
+            }
+        }
+        return "Precio actualizado de $" + (long) precioAnterior + " a $" + (long) nuevoPrecio
+                + ". Compradores notificados: " + notificados;
+    }
+
+    // Verifica si un inmueble satisface todos los criterios del filtro de un comprador
+    private boolean inmuebleCoincideConIntereses(Inmueble inmueble, FiltroBusqueda filtro) {
+        if (filtro == null) {
+            return false;
+        }
+        if (filtro.ciudad() != null && !filtro.ciudad().isEmpty()
+                && !inmueble.getCiudad().equalsIgnoreCase(filtro.ciudad())) {
+            return false;
+        }
+        if (filtro.tipoInmueble() != null && inmueble.getTipoInmueble() != filtro.tipoInmueble()) {
+            return false;
+        }
+        if (filtro.precioMaximo() > 0 && inmueble.getPrecio() > filtro.precioMaximo()) {
+            return false;
+        }
+        if (inmueble.getPrecio() < filtro.precioMinimo()) {
+            return false;
+        }
+        if (inmueble.getArea() < filtro.areaMinima()) {
+            return false;
+        }
+        return true;
     }
 
     // Retira una publicación por solicitud del vendedor
     public String procesarEliminacionPublicacion(Vendedor vendedor, String codigoPublicacion) {
         boolean eliminada = gestorPublicaciones.eliminarPublicacion(codigoPublicacion);
         if (!eliminada) {
-            return "Error: no se encontró la publicación.";
+            return "Error: no se encontro la publicacion.";
         }
-        return "Publicación eliminada correctamente.";
+        return "Publicacion retirada correctamente.";
     }
 
     // Vincula un inmueble ya creado a un vendedor y lo registra en el sistema
@@ -140,15 +186,6 @@ public class InmoSmart {
         return "Inmueble " + inmueble.getCodigo() + " vinculado a " + vendedor.getNombreCompleto();
     }
 
-    // RF06: delega la generación de reportes al gestor correspondiente
-    public void buscarInmueble() {
-        // El controlador construye el FiltroBusqueda y llama a consultarCatalogo()
-    }
-
-    public void procesarTransaccion(Oferta oferta) {
-        procesarCierreOferta(oferta, TipoOperacion.VENTA);
-    }
-
     public Usuario autenticarUsuario(String email, String password) {
         for (Usuario u : gestorUsuarios.getListaUsuarios()) {
             if (u.getEmail().equals(email) && u.getPassword().equals(password)) {
@@ -157,4 +194,79 @@ public class InmoSmart {
         }
         return null;
     }
+
+    // ── Registro y eliminación de usuarios (delega a GestorUsuarios) ──────────
+
+    public String registrarComprador(String nombre, String telefono, String email, String password,
+                                     double presupuesto, String ciudad,
+                                     TipoInmueble tipoInteres, double areaMin) {
+        return gestorUsuarios.registrarComprador(nombre, telefono, email, password,
+                presupuesto, ciudad, tipoInteres, areaMin);
+    }
+
+    // Solo el Administrador invoca este método desde su dashboard
+    public String registrarVendedor(String nombre, String telefono, String email, String password) {
+        return gestorUsuarios.registrarVendedor(nombre, telefono, email, password);
+    }
+
+    public boolean eliminarVendedor(String idVendedor) {
+        return gestorUsuarios.eliminarVendedor(idVendedor);
+    }
+
+    public boolean eliminarComprador(String idComprador) {
+        return gestorUsuarios.eliminarComprador(idComprador);
+    }
+
+    // El llamador debe pasar App.getUsuarioActual() para garantizar
+    // que solo se modifica la credencial del usuario que está en sesión.
+    public String cambiarContrasena(Usuario usuario, String nuevaContrasena) {
+        return gestorUsuarios.cambiarContrasena(usuario, nuevaContrasena);
+    }
+
+    // ── Reportes (solo Administrador) ────────────────────────────────────────
+
+    public Map<TipoInmueble, Integer> generarReporteTopInmuebles() {
+        return gestorReportes.generarReporteTopInmuebles(gestorTransacciones.getListaTransacciones());
+    }
+
+    public Map<String, Integer> generarReporteDemandaCiudad() {
+        return gestorReportes.generarReporteDemandaCiudad(gestorInmuebles.getListaInmuebles());
+    }
+
+    public List<Usuario> generarReporteCompradoresTop() {
+        return gestorReportes.generarReporteCompradoresTop(gestorUsuarios.listarCompradores());
+    }
+
+    // ── Actualización de perfil ───────────────────────────────────────────────
+
+    public String actualizarDatosContacto(Usuario usuario, String nuevoNombre, String nuevoTelefono,
+                                          String nuevoEmail, String nuevaPassword) {
+        if (!nuevoEmail.isEmpty() && !nuevoEmail.equalsIgnoreCase(usuario.getEmail())) {
+            for (Usuario u : gestorUsuarios.getListaUsuarios()) {
+                if (u.getEmail().equalsIgnoreCase(nuevoEmail)) {
+                    return "Error: ese correo ya esta en uso.";
+                }
+            }
+        }
+        if (!nuevoNombre.isEmpty()) usuario.setNombreCompleto(nuevoNombre);
+        if (!nuevoTelefono.isEmpty()) usuario.setTelefono(nuevoTelefono);
+        if (!nuevoEmail.isEmpty()) usuario.setEmail(nuevoEmail);
+        if (!nuevaPassword.isEmpty()) usuario.setPassword(nuevaPassword);
+        return "Datos actualizados correctamente.";
+    }
+
+    // ── Utilidades de búsqueda ────────────────────────────────────────────────
+
+    // Retorna las ciudades distintas con al menos una publicación activa
+    public List<String> getCiudadesDisponibles() {
+        List<String> ciudades = new ArrayList<>();
+        for (Publicacion p : gestorPublicaciones.getListaPublicaciones()) {
+            String ciudad = p.getInmueble().getCiudad();
+            if (!ciudades.contains(ciudad)) {
+                ciudades.add(ciudad);
+            }
+        }
+        return ciudades;
+    }
+
 }
