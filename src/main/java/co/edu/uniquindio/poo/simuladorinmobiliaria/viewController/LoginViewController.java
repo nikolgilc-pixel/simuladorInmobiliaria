@@ -2,6 +2,7 @@ package co.edu.uniquindio.poo.simuladorinmobiliaria.viewController;
 
 import co.edu.uniquindio.poo.simuladorinmobiliaria.App;
 import co.edu.uniquindio.poo.simuladorinmobiliaria.controller.LoginController;
+import co.edu.uniquindio.poo.simuladorinmobiliaria.model.Administrador;
 import co.edu.uniquindio.poo.simuladorinmobiliaria.model.Comprador;
 import co.edu.uniquindio.poo.simuladorinmobiliaria.model.Usuario;
 import co.edu.uniquindio.poo.simuladorinmobiliaria.model.Vendedor;
@@ -12,9 +13,9 @@ import javafx.scene.control.TextField;
 
 public class LoginViewController {
 
-    @FXML private TextField txtEmail;
+    @FXML private TextField     txtEmail;
     @FXML private PasswordField txtPassword;
-    @FXML private Label lblError;
+    @FXML private Label         lblError;
 
     private LoginController loginController;
 
@@ -41,13 +42,24 @@ public class LoginViewController {
 
         App.setUsuarioActual(usuario);
         try {
-            if (usuario instanceof Vendedor) {
+            if (usuario instanceof Administrador) {
+                App.navegarA("dashboard-admin.fxml");
+            } else if (usuario instanceof Vendedor) {
                 App.navegarA("dashboard-vendedor.fxml");
             } else if (usuario instanceof Comprador) {
                 App.navegarA("dashboard-comprador.fxml");
             }
         } catch (Exception e) {
             mostrarError("Error al abrir el dashboard: " + e.getMessage());
+        }
+    }
+
+    @FXML
+    void irARegistroAction() {
+        try {
+            App.navegarA("registro-comprador.fxml");
+        } catch (Exception e) {
+            mostrarError("Error al abrir el registro: " + e.getMessage());
         }
     }
 
